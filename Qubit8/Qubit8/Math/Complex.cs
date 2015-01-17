@@ -23,15 +23,18 @@ namespace Qubit8.Math
 
         public override string ToString()
         {
+            if (this.Real == 0 && this.Imaginary == 0)
+                return "0";
+
             string stringRepresentation = "";
-            if (this.Real > 0)
+            if (this.Real != 0)
             {
                 stringRepresentation += this.Real.ToString();
             }
 
-            if (this.Imaginary > 0)
+            if (this.Imaginary != 0)
             {
-                if (this.Real > 0)
+                if (this.Real != 0)
                     stringRepresentation += " + ";
                 stringRepresentation += this.Imaginary.ToString() + "i";
             }
@@ -50,7 +53,7 @@ namespace Qubit8.Math
 
         public static Complex operator *(Complex one, Complex two)
         {
-            double real = one.Real * two.Real + one.Imaginary * two.Imaginary;
+            double real = one.Real * two.Real - one.Imaginary * two.Imaginary;
             double imaginary = one.Imaginary * two.Real + one.Real * two.Imaginary;
             return new Complex(real, imaginary);
         }
