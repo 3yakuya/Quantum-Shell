@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Numerics;
 using System.Threading.Tasks;
+using Qubit8.Math;
 
 namespace Qubit8
 {
@@ -42,8 +42,8 @@ namespace Qubit8
 
         public void Reset()
         {
-            this.StateVector[0] = 1;
-            this.StateVector[1] = 0;
+            this.StateVector[0] = new Complex(1);
+            this.StateVector[1] = new Complex(0);
             this.EntangledList.Clear();
         }
 
@@ -75,8 +75,8 @@ namespace Qubit8
 
         public int Measure()
         {
-            double probability0 = Complex.Pow(Amplitude0, 2).Real;
-            double probability1 = Complex.Pow(Amplitude1, 2).Real;
+            double probability0 = Complex.Power(Amplitude0, 2).Real;
+            double probability1 = Complex.Power(Amplitude1, 2).Real;
 
             Random random = new Random();
             double randomProbability = random.NextDouble();
