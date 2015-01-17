@@ -30,6 +30,8 @@ namespace Qubit8
 
         public Qubit()
         {
+            this.StateVector = new Complex[2];
+            this.EntangledList = new List<Qubit>();
             this.Reset();
         }
 
@@ -40,14 +42,34 @@ namespace Qubit8
 
         public void Reset()
         {
-            this.StateVector[0] = Amplitude0;
-            this.StateVector[1] = Amplitude1;
-            this.EntangledList = new List<Qubit>();
+            this.StateVector[0] = 1;
+            this.StateVector[1] = 0;
+            this.EntangledList.Clear();
         }
 
         public string Peek()
         {
-            string stateString = this.Amplitude0.ToString() + "|0> + " + this.Amplitude1.ToString() + "|1>";
+            string stateString = "";
+            if (this.Amplitude0.Real > 0)
+            {
+                if (this.Amplitude0.Imaginary == 0)
+                    stateString += this.Amplitude0.Real.ToString();
+                else
+                    stateString += this.Amplitude0.ToString();
+
+                stateString += "|0>";
+            }
+
+            if (this.Amplitude1.Real > 0)
+            {
+                stateString += " + ";
+                if (this.Amplitude1.Imaginary == 0)
+                    stateString += this.Amplitude1.Real.ToString();
+                else
+                    stateString += this.Amplitude1.ToString();
+
+                stateString += "|1>";
+            }
             return stateString;
         }
 

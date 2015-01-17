@@ -10,6 +10,9 @@ namespace Qubit8
     {
         static void Main(string[] args)
         {
+            Qubit qubit = new Qubit();
+            Console.WriteLine(qubit.Peek());
+            Console.ReadLine();
         }
     }
 }
