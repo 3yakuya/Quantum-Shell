@@ -28,6 +28,8 @@ namespace Qubit8.Math
             }
         }
 
+        public ComplexMatrix() : this(1, 1) { }
+
         public ComplexMatrix IdentityMatrix(int size)
         {
             ComplexMatrix identityMatrix = new ComplexMatrix(size, size);

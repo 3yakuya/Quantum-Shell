@@ -24,7 +24,7 @@ namespace Qubit8
             two.Matrix[1][0] = new Complex(2);
             two.Matrix[1][1] = new Complex(-1);
 
-            ComplexMatrix matrix = one.Dot(two);
+            ComplexMatrix matrix = new ComplexMatrix().IdentityMatrix(8);
 
             for (int i = 0; i < matrix.RowCount; i++)
             {
