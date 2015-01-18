@@ -13,14 +13,18 @@ namespace Qubit8
         {
 
             ComplexMatrix one = new ComplexMatrix(2, 2);
-            one.Matrix[0][0] = new Complex(1);
-            one.Matrix[1][1] = new Complex(1);
+            one.Matrix[0][0] = new Complex(-1);
+            one.Matrix[0][1] = new Complex(3);
+            one.Matrix[1][0] = new Complex(4);
+            one.Matrix[1][1] = new Complex(5);
 
             ComplexMatrix two = new ComplexMatrix(2, 2);
-            two.Matrix[1][0] = new Complex(1);
-            two.Matrix[0][1] = new Complex(1);
+            two.Matrix[0][0] = new Complex(1);
+            two.Matrix[0][1] = new Complex(0);
+            two.Matrix[1][0] = new Complex(2);
+            two.Matrix[1][1] = new Complex(-1);
 
-            ComplexMatrix matrix = one.Tensorize(two);
+            ComplexMatrix matrix = one.Dot(two);
 
             for (int i = 0; i < matrix.RowCount; i++)
             {
