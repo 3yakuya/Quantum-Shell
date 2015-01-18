@@ -11,29 +11,23 @@ namespace Qubit8
     {
         static void Main(string[] args)
         {
+            Qubit qubit = new Qubit();
+            Complex[] stateArray = new Complex[9];
+            stateArray[0] = new Complex(0);
+            stateArray[1] = new Complex(0);
+            stateArray[2] = new Complex(0.2);
+            stateArray[3] = new Complex(0.2);
+            stateArray[4] = new Complex(0.2);
+            stateArray[5] = new Complex(0);
+            stateArray[6] = new Complex(0.2);
+            stateArray[7] = new Complex(0);
+            stateArray[8] = new Complex(0.2);
+            qubit.StateVector = stateArray;
 
-            ComplexMatrix one = new ComplexMatrix(2, 2);
-            one.Matrix[0][0] = new Complex(-1);
-            one.Matrix[0][1] = new Complex(3);
-            one.Matrix[1][0] = new Complex(4);
-            one.Matrix[1][1] = new Complex(5);
-
-            ComplexMatrix two = new ComplexMatrix(2, 2);
-            two.Matrix[0][0] = new Complex(1);
-            two.Matrix[0][1] = new Complex(0);
-            two.Matrix[1][0] = new Complex(2);
-            two.Matrix[1][1] = new Complex(-1);
-
-            ComplexMatrix matrix = new ComplexMatrix().IdentityMatrix(8);
-
-            for (int i = 0; i < matrix.RowCount; i++)
-            {
-                for (int j = 0; j < matrix.ColumnCount; j++)
-                {
-                    Console.Write(matrix.Matrix[i][j] + "\t");
-                }
-                Console.Write("\n");
-            }
+            Console.WriteLine(qubit.Measure());
+            Console.WriteLine();
+            foreach (var value in qubit.StateVector)
+                Console.Write(value + "\t");
             Console.ReadLine();
         }
     }

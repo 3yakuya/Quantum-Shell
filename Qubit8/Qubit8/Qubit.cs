@@ -27,6 +27,7 @@ namespace Qubit8
 
         public Complex[] StateVector { get; set; }
         public IList<Qubit> EntangledList { get; private set; }
+        private int entangledPosition = 0;
 
         public Qubit()
         {
@@ -35,18 +36,22 @@ namespace Qubit8
             this.Reset();
         }
 
+        //TODO: Ensure a new state vector is created.
         public void EntangleWith(Qubit qubit)
         {
             this.EntangledList.Add(qubit);
         }
 
+        //TODO: Set the StateVecor to the new one with correct values (dis-entangle).
         public void Reset()
         {
             this.StateVector[0] = new Complex(1);
             this.StateVector[1] = new Complex(0);
+
             this.EntangledList.Clear();
         }
 
+        //TODO: Change to show the entangled state rather than a single Qubit.
         public string Peek()
         {
             string stateString = "";
@@ -73,26 +78,48 @@ namespace Qubit8
             return stateString;
         }
 
+        //TODO: ensure correct probabilities for the remaining states after removing
+        //impossible ones.
         public int Measure()
         {
-            double probability0 = Complex.Power(Amplitude0, 2).Real;
-            double probability1 = Complex.Power(Amplitude1, 2).Real;
+            double probability0 = GetProbabilityOfMeasuringZero();
 
             Random random = new Random();
             double randomProbability = random.NextDouble();
-            if (probability0 > probability1)
-            {
-                if (randomProbability < probability0)
-                    return 0;
-                else
-                    return 1;
-            }
+
+            int result;
+            if (randomProbability > probability0)
+                result = 0;
             else
+                result = 1;
+
+            ClearImpossibleStates(result);
+            return result;
+        }
+
+        private bool BitIsSet(int number, int bit)
+        {
+            return (number & (1 << bit)) != 0;
+        }
+
+        private double GetProbabilityOfMeasuringZero()
+        {
+            double probabilityOfZero = 0;
+            for (int stateIndex = 0; stateIndex < StateVector.Length; stateIndex++)
             {
-                if (randomProbability < probability1)
-                    return 1;
-                else
-                    return 0;
+                if (!BitIsSet(stateIndex, entangledPosition))
+                    probabilityOfZero += Complex.Power(StateVector[stateIndex], 2).Real;
+            }
+            return probabilityOfZero;
+        }
+
+        private void ClearImpossibleStates(int measuredValue)
+        {
+            for (int stateIndex = 0; stateIndex < StateVector.Length; stateIndex++)
+            {
+                if ((BitIsSet(stateIndex, entangledPosition) && measuredValue == 0) ||
+                    (!BitIsSet(stateIndex, entangledPosition) && measuredValue == 1))
+                    StateVector[stateIndex] = new Complex(0);
             }
         }
     }
