@@ -11,14 +11,16 @@ namespace Qubit8
     {
         static void Main(string[] args)
         {
-            ComplexMatrix matrix = new ComplexMatrix(3, 3);
-            for (int i = 0; i < matrix.RowCount; i++)
-            {
-                for (int j = 0; j < matrix.ColumnCount; j++)
-                {
-                    matrix.Matrix[i][j] = Complex.Power(new Complex(0.3, 2), 3);
-                }
-            }
+
+            ComplexMatrix one = new ComplexMatrix(2, 2);
+            one.Matrix[0][0] = new Complex(1);
+            one.Matrix[1][1] = new Complex(1);
+
+            ComplexMatrix two = new ComplexMatrix(2, 2);
+            two.Matrix[1][0] = new Complex(1);
+            two.Matrix[0][1] = new Complex(1);
+
+            ComplexMatrix matrix = one.Tensorize(two);
 
             for (int i = 0; i < matrix.RowCount; i++)
             {

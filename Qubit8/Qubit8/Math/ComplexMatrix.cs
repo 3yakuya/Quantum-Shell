@@ -42,5 +42,21 @@ namespace Qubit8.Math
                     }
             return result;
         }
+
+        public ComplexMatrix Tensorize(ComplexMatrix second)
+        {
+            ComplexMatrix result = new ComplexMatrix(this.RowCount * second.RowCount, this.ColumnCount * second.ColumnCount);
+
+            for (int firstRow = 0; firstRow < this.RowCount; firstRow++)
+                for (int firstColumn = 0; firstColumn < this.ColumnCount; firstColumn++)
+                    for (int secondRow = 0; secondRow < second.RowCount; secondRow++)
+                        for (int secondColumn = 0; secondColumn < second.ColumnCount; secondColumn++)
+                        {
+                            int row = firstRow*this.RowCount + secondRow;
+                            int column = firstColumn*this.ColumnCount + secondColumn;
+                            result.Matrix[row][column] = this.Matrix[firstRow][firstColumn] * second.Matrix[secondRow][secondColumn];
+                        }
+            return result;
+        }
     }
 }
