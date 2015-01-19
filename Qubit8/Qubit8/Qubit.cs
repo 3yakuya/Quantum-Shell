@@ -87,6 +87,7 @@ namespace Qubit8
                 result = 1;
 
             ClearImpossibleStates(result);
+            NormalizeStateVector();
             return result;
         }
 
@@ -147,16 +148,19 @@ namespace Qubit8
             }
         }
 
-        private void UpdateStateVector()
+        private void NormalizeStateVector()
         {
             double remainingProbabilitiesSum = 0;
-            foreach (Complex amplitude in this.StateVector.Matrix)
+            foreach (Complex amplitude in this.StateVector.Matrix[0])
             {
                 remainingProbabilitiesSum += Complex.Power(amplitude, 2).Real;
             }
 
             Complex normalizer = new Complex(System.Math.Sqrt(remainingProbabilitiesSum));
-            
+            for (int amplitudeIndex = 0; amplitudeIndex < StateVector.ColumnCount; amplitudeIndex++)
+            {
+                StateVector.Matrix[0][amplitudeIndex] /= normalizer;
+            }
         }
     }
 }

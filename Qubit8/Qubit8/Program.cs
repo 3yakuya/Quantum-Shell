@@ -48,20 +48,21 @@ namespace Qubit8
             qubit.EntangleWith(qubit);
             qubit2.EntangleWith(qubit3);
             qubit3.EntangleWith(qubit);
+            Console.WriteLine(qubit.Peek());
+            Console.WriteLine();
 
-            //Console.WriteLine(qubit.Measure());
-            //Console.WriteLine();
-            //foreach (var value in qubit.StateVector.Matrix)
-            //    Console.Write(value + "\t");
+            Console.WriteLine(qubit.Measure());
+            Console.WriteLine();
+            Console.WriteLine(qubit2.Peek());
+
+            Console.WriteLine(qubit2.Measure());
+            Console.WriteLine();
+            Console.WriteLine(qubit3.Peek());
 
             //Console.WriteLine();
             //Console.WriteLine(qubit3.Peek());
-            //Console.ReadLine();
-
-            Complex one = new Complex(4, 5.6);
-            Complex two = new Complex(2, -4.1);
-            Console.WriteLine(one / two);
             Console.ReadLine();
+
         }
     }
 }
