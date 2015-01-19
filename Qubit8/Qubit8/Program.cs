@@ -45,9 +45,9 @@ namespace Qubit8
             stateArray3.Matrix[0][1] = new Complex(0.7);
             qubit3.StateVector = stateArray2;
 
-            qubit.EntangleWith(qubit);
-            qubit2.EntangleWith(qubit3);
-            qubit3.EntangleWith(qubit);
+            qubit.JoinState(qubit2);
+            qubit2.JoinState(qubit3);
+            //qubit3.EntangleWith(qubit);
             Console.WriteLine(qubit.Peek());
             Console.WriteLine();
 
@@ -58,6 +58,10 @@ namespace Qubit8
             Console.WriteLine(qubit2.Measure());
             Console.WriteLine();
             Console.WriteLine(qubit3.Peek());
+
+            Console.WriteLine(qubit3.Measure());
+            Console.WriteLine();
+            Console.WriteLine(qubit.Peek());
 
             //Console.WriteLine();
             //Console.WriteLine(qubit3.Peek());

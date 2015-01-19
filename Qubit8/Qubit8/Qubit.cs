@@ -18,8 +18,7 @@ namespace Qubit8
             this.Reset();
         }
 
-        //TODO: Ensure a new state vector is created.
-        public void EntangleWith(Qubit qubit)
+        public void JoinState(Qubit qubit)
         {
             var currentStateQubitList = new List<Qubit>(this.StateQubitList);
             currentStateQubitList.Add(qubit);
@@ -71,8 +70,6 @@ namespace Qubit8
                 return stateString;
         }
 
-        //TODO: ensure correct probabilities for the remaining states after removing
-        //impossible ones.
         public int Measure()
         {
             double probability0 = GetProbabilityOfMeasuringZero();
