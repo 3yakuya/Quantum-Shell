@@ -11,26 +11,43 @@ namespace Qubit8
     {
         static void Main(string[] args)
         {
-            Qubit qubit = new Qubit();
-            ComplexMatrix stateArray = new ComplexMatrix(1, 2);
-            stateArray.Matrix[0][0] = new Complex(0.7);
-            stateArray.Matrix[0][1] = new Complex(0.7);
-            qubit.StateVector = stateArray;
+            ComplexMatrix one = new ComplexMatrix().IdentityMatrix(4);
+            ComplexMatrix two = new ComplexMatrix(2,2);
+            two.Matrix[0][1] = new Complex(8);
+            two.Matrix[1][0] = new Complex(7);
+            two = one.Tensorize(two);
 
-            Qubit qubit2 = new Qubit();
-            ComplexMatrix stateArray2 = new ComplexMatrix(1, 2);
-            stateArray2.Matrix[0][0] = new Complex(0.7);
-            stateArray2.Matrix[0][1] = new Complex(0.7);
-            qubit2.StateVector = stateArray2;
+            for (int i = 0; i < two.RowCount; i++)
+            {
+                for (int j = 0; j < two.ColumnCount; j++ )
+                {
+                    Console.Write(two.Matrix[i][j] + "\t");
+                }
+                Console.WriteLine();
+            }
+                   
 
-            Qubit qubit3 = new Qubit();
-            ComplexMatrix stateArray3 = new ComplexMatrix(1, 2);
-            stateArray3.Matrix[0][0] = new Complex(0.7);
-            stateArray3.Matrix[0][1] = new Complex(0.7);
-            qubit3.StateVector = stateArray2;
+            //Qubit qubit = new Qubit();
+            //ComplexMatrix stateArray = new ComplexMatrix(1, 2);
+            //stateArray.Matrix[0][0] = new Complex(0.7);
+            //stateArray.Matrix[0][1] = new Complex(0.7);
+            //qubit.StateVector = stateArray;
 
-            qubit.EntangleWith(qubit2);
-            qubit.EntangleWith(qubit3);
+            //Qubit qubit2 = new Qubit();
+            //ComplexMatrix stateArray2 = new ComplexMatrix(1, 2);
+            //stateArray2.Matrix[0][0] = new Complex(0.7);
+            //stateArray2.Matrix[0][1] = new Complex(0.7);
+            //qubit2.StateVector = stateArray2;
+
+            //Qubit qubit3 = new Qubit();
+            //ComplexMatrix stateArray3 = new ComplexMatrix(1, 2);
+            //stateArray3.Matrix[0][0] = new Complex(0.7);
+            //stateArray3.Matrix[0][1] = new Complex(0.7);
+            //qubit3.StateVector = stateArray2;
+
+            //qubit.EntangleWith(qubit2);
+            //qubit2.EntangleWith(qubit3);
+            //qubit.EntangleWith(qubit3);
 
             //Console.WriteLine(qubit.Measure());
             //Console.WriteLine();
@@ -38,7 +55,7 @@ namespace Qubit8
             //    Console.Write(value + "\t");
 
             Console.WriteLine();
-            Console.WriteLine(qubit.Peek());
+            //Console.WriteLine(qubit.Peek());
             Console.ReadLine();
         }
     }
