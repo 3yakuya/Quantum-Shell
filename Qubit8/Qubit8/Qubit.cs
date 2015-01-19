@@ -146,5 +146,17 @@ namespace Qubit8
                     StateVector.Matrix[0][stateIndex] = new Complex(0);
             }
         }
+
+        private void UpdateStateVector()
+        {
+            double remainingProbabilitiesSum = 0;
+            foreach (Complex amplitude in this.StateVector.Matrix)
+            {
+                remainingProbabilitiesSum += Complex.Power(amplitude, 2).Real;
+            }
+
+            Complex normalizer = new Complex(System.Math.Sqrt(remainingProbabilitiesSum));
+            
+        }
     }
 }

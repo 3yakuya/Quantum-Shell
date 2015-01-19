@@ -79,6 +79,19 @@ namespace Qubit8.Math
             return new Complex(real, imaginary);
         }
 
+        public static Complex operator /(Complex one, Complex two)
+        {
+            if (two.Real == 0 && two.Imaginary == 0)
+                throw new ArgumentException();
+
+            Complex result = new Complex();
+            result.Real = (one.Real * two.Real + one.Imaginary * two.Imaginary) /
+                (two.Real * two.Real + two.Imaginary * two.Imaginary);
+            result.Imaginary = (one.Imaginary * two.Real - one.Real * two.Imaginary) /
+                (two.Real * two.Real + two.Imaginary * two.Imaginary);
+            return result;
+        }
+
         public static bool operator ==(Complex one, Complex two)
         {
             if (one.Real == two.Real && one.Imaginary == two.Imaginary)
