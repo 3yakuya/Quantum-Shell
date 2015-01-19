@@ -55,27 +55,22 @@ namespace Qubit8
         public string Peek()
         {
             string stateString = "";
-            if (this.Amplitude0.Real > 0)
+            int numberOfStates = StateVector.Length;
+            int qubitsInState = Convert.ToString(StateVector.Length, 2).Length - 1;
+            bool firstStatePassed = false;
+
+            for (int state = 0; state < numberOfStates; state++)
             {
-                if (this.Amplitude0.Imaginary == 0)
-                    stateString += this.Amplitude0.Real.ToString();
-                else
-                    stateString += this.Amplitude0.ToString();
-
-                stateString += "|0>";
+                if (StateVector[state] != new Complex(0))
+                {
+                    if (firstStatePassed)
+                        stateString += " + ";
+                    firstStatePassed = true;
+                    stateString += StateVector[state];
+                    stateString += "|" + Convert.ToString(state, 2).PadLeft(qubitsInState, '0') + ">";
+                }
             }
-
-            if (this.Amplitude1.Real > 0)
-            {
-                stateString += " + ";
-                if (this.Amplitude1.Imaginary == 0)
-                    stateString += this.Amplitude1.Real.ToString();
-                else
-                    stateString += this.Amplitude1.ToString();
-
-                stateString += "|1>";
-            }
-            return stateString;
+                return stateString;
         }
 
         //TODO: ensure correct probabilities for the remaining states after removing
