@@ -9,64 +9,56 @@ namespace Qubit8
 {
     class Qubit
     {
-        public Complex Amplitude0
-        {
-            get
-            {
-                return this.StateVector[0];
-            }
-        }
-
-        public Complex Amplitude1
-        {
-            get
-            {
-                return this.StateVector[1];
-            }
-        }
-
-        public Complex[] StateVector { get; set; }
-        public IList<Qubit> EntangledList { get; private set; }
-        private int entangledPosition = 0;
+        public ComplexMatrix StateVector { get; set; }
+        public IList<Qubit> StateQubitsList { get; private set; }
+        private int statePosition = 0;
 
         public Qubit()
         {
-            this.StateVector = new Complex[2];
-            this.EntangledList = new List<Qubit>();
             this.Reset();
         }
 
         //TODO: Ensure a new state vector is created.
         public void EntangleWith(Qubit qubit)
         {
-            this.EntangledList.Add(qubit);
+            this.StateQubitsList.Add(qubit);
+            var allStateQubits = GetAllStateQubits();
+            this.StateQubitsList = allStateQubits;
+            var fullStateVector = GetStateVector(allStateQubits);
+
+            foreach (Qubit stateQubit in StateQubitsList)
+            {
+                stateQubit.StateQubitsList = allStateQubits;
+                stateQubit.StateVector = fullStateVector;
+                stateQubit.SetSelfStatePosition();
+            }
         }
 
-        //TODO: Set the StateVecor to the new one with correct values (dis-entangle).
         public void Reset()
         {
-            this.StateVector[0] = new Complex(1);
-            this.StateVector[1] = new Complex(0);
+            this.StateVector = new ComplexMatrix(1, 2);
+            this.StateVector.Matrix[0][0] = new Complex(1);
+            this.StateVector.Matrix[0][1] = new Complex(0);
 
-            this.EntangledList.Clear();
+            this.StateQubitsList = new List<Qubit>();
+            this.StateQubitsList.Add(this);
         }
 
-        //TODO: Change to show the entangled state rather than a single Qubit.
         public string Peek()
         {
             string stateString = "";
-            int numberOfStates = StateVector.Length;
-            int qubitsInState = Convert.ToString(StateVector.Length, 2).Length - 1;
+            int numberOfStates = StateVector.ColumnCount;
+            int qubitsInState = Convert.ToString(StateVector.ColumnCount, 2).Length - 1;
             bool firstStatePassed = false;
 
             for (int state = 0; state < numberOfStates; state++)
             {
-                if (StateVector[state] != new Complex(0))
+                if (StateVector.Matrix[0][state] != new Complex(0))
                 {
                     if (firstStatePassed)
                         stateString += " + ";
                     firstStatePassed = true;
-                    stateString += StateVector[state];
+                    stateString += StateVector.Matrix[0][state];
                     stateString += "|" + Convert.ToString(state, 2).PadLeft(qubitsInState, '0') + ">";
                 }
             }
@@ -92,6 +84,32 @@ namespace Qubit8
             return result;
         }
 
+        private void SetSelfStatePosition()
+        {
+            this.statePosition = this.StateQubitsList.IndexOf(this);
+        }
+
+        private ComplexMatrix GetStateVector(IList<Qubit> stateQubitList)
+        {
+            ComplexMatrix stateVector = new ComplexMatrix();
+            stateVector.Matrix[0][0] = new Complex(1);
+            foreach (Qubit qubit in stateQubitList)
+            {
+                stateVector = stateVector.Tensorize(qubit.StateVector);
+            }
+            return stateVector;
+        }
+
+        private IList<Qubit> GetAllStateQubits()
+        {
+            List<Qubit> stateQubitList = new List<Qubit>(this.StateQubitsList);
+            foreach (Qubit qubit in this.StateQubitsList)
+            {
+                stateQubitList = stateQubitList.Union(qubit.StateQubitsList).ToList<Qubit>();
+            }
+            return stateQubitList;
+        }
+
         private bool BitIsSet(int number, int bit)
         {
             return (number & (1 << bit)) != 0;
@@ -100,21 +118,21 @@ namespace Qubit8
         private double GetProbabilityOfMeasuringZero()
         {
             double probabilityOfZero = 0;
-            for (int stateIndex = 0; stateIndex < StateVector.Length; stateIndex++)
+            for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
-                if (!BitIsSet(stateIndex, entangledPosition))
-                    probabilityOfZero += Complex.Power(StateVector[stateIndex], 2).Real;
+                if (!BitIsSet(stateIndex, statePosition))
+                    probabilityOfZero += Complex.Power(StateVector.Matrix[0][stateIndex], 2).Real;
             }
             return probabilityOfZero;
         }
 
         private void ClearImpossibleStates(int measuredValue)
         {
-            for (int stateIndex = 0; stateIndex < StateVector.Length; stateIndex++)
+            for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
-                if ((BitIsSet(stateIndex, entangledPosition) && measuredValue == 0) ||
-                    (!BitIsSet(stateIndex, entangledPosition) && measuredValue == 1))
-                    StateVector[stateIndex] = new Complex(0);
+                if ((BitIsSet(stateIndex, statePosition) && measuredValue == 0) ||
+                    (!BitIsSet(stateIndex, statePosition) && measuredValue == 1))
+                    StateVector.Matrix[0][stateIndex] = new Complex(0);
             }
         }
     }
