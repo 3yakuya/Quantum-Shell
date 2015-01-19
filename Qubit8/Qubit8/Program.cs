@@ -30,7 +30,7 @@ namespace Qubit8
             qubit3.StateVector = stateArray2;
 
             qubit.EntangleWith(qubit2);
-            qubit2.EntangleWith(qubit3);
+            qubit.EntangleWith(qubit3);
 
             //Console.WriteLine(qubit.Measure());
             //Console.WriteLine();

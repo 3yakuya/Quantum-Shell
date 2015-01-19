@@ -10,7 +10,7 @@ namespace Qubit8
     class Qubit
     {
         public ComplexMatrix StateVector { get; set; }
-        public IList<Qubit> StateQubitsList { get; private set; }
+        public IList<Qubit> StateQubitList { get; private set; }
         private int statePosition = 0;
 
         public Qubit()
@@ -21,14 +21,18 @@ namespace Qubit8
         //TODO: Ensure a new state vector is created.
         public void EntangleWith(Qubit qubit)
         {
-            this.StateQubitsList.Add(qubit);
-            var allStateQubits = GetAllStateQubits();
-            this.StateQubitsList = allStateQubits;
-            var fullStateVector = GetStateVector(allStateQubits);
+            var currentStateQubitList = new List<Qubit>(this.StateQubitList);
+            currentStateQubitList.Add(qubit);
+            var newStateQubitList = GetStateQubitList(currentStateQubitList);
+            var qubitsToConsiderInState = FilterQubitsInCurrentState(this.StateQubitList, newStateQubitList);
+            qubitsToConsiderInState.Add(this);
 
-            foreach (Qubit stateQubit in StateQubitsList)
+            this.StateQubitList = newStateQubitList;
+            var fullStateVector = GetStateVector(qubitsToConsiderInState);
+
+            foreach (Qubit stateQubit in StateQubitList)
             {
-                stateQubit.StateQubitsList = allStateQubits;
+                stateQubit.StateQubitList = newStateQubitList;
                 stateQubit.StateVector = fullStateVector;
                 stateQubit.SetSelfStatePosition();
             }
@@ -40,8 +44,10 @@ namespace Qubit8
             this.StateVector.Matrix[0][0] = new Complex(1);
             this.StateVector.Matrix[0][1] = new Complex(0);
 
-            this.StateQubitsList = new List<Qubit>();
-            this.StateQubitsList.Add(this);
+            this.StateQubitList = new List<Qubit>();
+            this.StateQubitList.Add(this);
+            this.SetSelfStatePosition();
+
         }
 
         public string Peek()
@@ -86,26 +92,31 @@ namespace Qubit8
 
         private void SetSelfStatePosition()
         {
-            this.statePosition = this.StateQubitsList.IndexOf(this);
+            this.statePosition = this.StateQubitList.IndexOf(this);
         }
 
-        private ComplexMatrix GetStateVector(IList<Qubit> stateQubitList)
+        private ComplexMatrix GetStateVector(IList<Qubit> qubitsToAddToState)
         {
             ComplexMatrix stateVector = new ComplexMatrix();
             stateVector.Matrix[0][0] = new Complex(1);
-            foreach (Qubit qubit in stateQubitList)
+            foreach (Qubit qubit in qubitsToAddToState)
             {
                 stateVector = stateVector.Tensorize(qubit.StateVector);
             }
             return stateVector;
         }
 
-        private IList<Qubit> GetAllStateQubits()
+        private IList<Qubit> FilterQubitsInCurrentState(IList<Qubit> currentQubitList, IList<Qubit> extendedQubitList)
         {
-            List<Qubit> stateQubitList = new List<Qubit>(this.StateQubitsList);
-            foreach (Qubit qubit in this.StateQubitsList)
+            return extendedQubitList.Except(currentQubitList).ToList();
+        }
+
+        private IList<Qubit> GetStateQubitList(IList<Qubit> currentQubitStateList)
+        {
+            List<Qubit> stateQubitList = new List<Qubit>(currentQubitStateList);
+            foreach (Qubit qubit in this.StateQubitList)
             {
-                stateQubitList = stateQubitList.Union(qubit.StateQubitsList).ToList<Qubit>();
+                stateQubitList = stateQubitList.Union(qubit.StateQubitList).ToList();
             }
             return stateQubitList;
         }
