@@ -11,7 +11,7 @@ namespace Qubit8
     {
         public ComplexMatrix StateVector { get; private set; }
         public IList<Qubit> StateQubitList { get; private set; }
-        private int statePosition = 0;
+        private int StateIndex { get; set; }
 
         public Qubit()
         {
@@ -62,7 +62,8 @@ namespace Qubit8
         {
             if (controlQubit == this)
                 throw new ArgumentException("Target and control qubits can not be the same.");
-            ComplexMatrix controlledOperator = BuildControlledQuantumGate(gate, controlQubit, this);
+            JoinState(controlQubit);
+            ComplexMatrix controlledOperator = BuildControlledQuantumOperator(gate, controlQubit, this);
             ComplexMatrix newStateVector = this.StateVector.Dot(controlledOperator);
             SetState(newStateVector);
         }
@@ -113,36 +114,34 @@ namespace Qubit8
             return result;
         }
 
-        private ComplexMatrix BuildControlledQuantumGate(QuantumGate gate, Qubit control, Qubit target)
+        private ComplexMatrix BuildControlledQuantumOperator(QuantumGate gate, Qubit control, Qubit target)
         {
             int stateSize = StateVector.Matrix[0].Count;
             ComplexMatrix controlledTransform = new ComplexMatrix().IdentityMatrix(stateSize);
 
             for (int row = 0; row < stateSize; row++)
             {
-                if (BitIsSet(row, control.statePosition))
+                if (BitIsSet(row, control.StateIndex))
                 {
                     for (int column = 0; column < stateSize; column++)
                     {
                         bool correctState = true;
                         for (int stateBit = 0; (stateBit < stateSize) && correctState; stateBit++)
                         {
-                            if ((stateBit != target.statePosition) &&
-                            (BitIsSet(column, stateBit) != BitIsSet(row, stateBit)))
+                            if ((BitIsSet(column, stateBit) != BitIsSet(row, stateBit)) && (stateBit != target.StateIndex))
                             {
                                     correctState = false;
                             }
                         }
                         if (correctState)
                         {
-                            int transformRow = Convert.ToInt32(BitIsSet(row, target.statePosition));
-                            int transformColumn = Convert.ToInt32(BitIsSet(column, target.statePosition));
+                            int transformRow = Convert.ToInt32(BitIsSet(row, target.StateIndex));
+                            int transformColumn = Convert.ToInt32(BitIsSet(column, target.StateIndex));
                             controlledTransform.Matrix[row][column] = gate.Transform.Matrix[transformRow][transformColumn]; 
                         }
                     }
                 }
             }
-
             return controlledTransform;
         }
 
@@ -154,7 +153,7 @@ namespace Qubit8
 
             for (int qubitIndex = 0; qubitIndex < this.StateQubitList.Count; qubitIndex++)
             {
-                if (qubitIndex == this.statePosition)
+                if (qubitIndex == this.StateIndex)
                 {
                     stateOperator = gate.Transform.Tensorize(stateOperator);
                     qubitIndex += gate.QubitCount - 1;
@@ -180,7 +179,7 @@ namespace Qubit8
 
         private void SetSelfStatePosition()
         {
-            this.statePosition = this.StateQubitList.IndexOf(this);
+            this.StateIndex = this.StateQubitList.IndexOf(this);
         }
 
         private ComplexMatrix GetStateVector(IList<Qubit> qubitsToAddToState)
@@ -219,7 +218,7 @@ namespace Qubit8
             double probabilityOfZero = 0;
             for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
-                if (!BitIsSet(stateIndex, statePosition))
+                if (!BitIsSet(stateIndex, StateIndex))
                     probabilityOfZero += Complex.Power(StateVector.Matrix[0][stateIndex], 2).Real;
             }
             return probabilityOfZero;
@@ -229,8 +228,8 @@ namespace Qubit8
         {
             for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
-                if ((BitIsSet(stateIndex, statePosition) && measuredValue == 0) ||
-                    (!BitIsSet(stateIndex, statePosition) && measuredValue == 1))
+                if ((BitIsSet(stateIndex, StateIndex) && measuredValue == 0) ||
+                    (!BitIsSet(stateIndex, StateIndex) && measuredValue == 1))
                     StateVector.Matrix[0][stateIndex] = new Complex(0);
             }
         }

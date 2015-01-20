@@ -10,7 +10,8 @@ namespace Qubit8.QuantumGates
     class CNOTGate : QuantumGate
     {
         public override int QubitCount { get; protected set; }
-        public override ComplexMatrix Transform { get; protected set; }
+        public override ComplexMatrix Transform { get; protected set; }
+
         public CNOTGate()
         {
             this.QubitCount = 2;

@@ -43,21 +43,21 @@ namespace Qubit8
             //qubit2.TransformState(H);
 
             Qubit qubit3 = new Qubit();
-            //qubit3.TransformState(H);
+            qubit3.TransformState(H);
 
             qubit.SetState(stateArray);
-            qubit2.SetState(stateArray);
-            qubit3.SetState(stateArray);
+            //qubit2.SetState(stateArray);
+            //qubit3.SetState(stateArray);
 
             qubit.JoinState(qubit2);
             qubit2.JoinState(qubit3);
-            qubit3.JoinState(qubit);
-            qubit.JoinState(qubit);
+            //qubit3.JoinState(qubit);
+            //qubit.JoinState(qubit);
             Console.WriteLine(qubit.Peek());
             Console.WriteLine();
 
             Console.WriteLine("-----------------------CNOT1----------------------");
-            qubit3.TransformStateControlled(X, qubit2);
+            qubit.TransformStateControlled(X, qubit3);
             Console.WriteLine(qubit.Peek());
             Console.WriteLine();
 
