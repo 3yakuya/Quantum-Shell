@@ -20,6 +20,8 @@ namespace Qubit8
 
         public void JoinState(Qubit qubit)
         {
+            if (this.StateQubitList.Contains(qubit))
+                return;
             var currentStateQubitList = new List<Qubit>(this.StateQubitList);
             currentStateQubitList.Add(qubit);
             var newStateQubitList = GetStateQubitList(currentStateQubitList);

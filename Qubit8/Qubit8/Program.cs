@@ -47,7 +47,8 @@ namespace Qubit8
 
             qubit.JoinState(qubit2);
             qubit2.JoinState(qubit3);
-            //qubit3.EntangleWith(qubit);
+            qubit3.JoinState(qubit);
+            qubit.JoinState(qubit);
             Console.WriteLine(qubit.Peek());
             Console.WriteLine();
 
@@ -63,10 +64,7 @@ namespace Qubit8
             Console.WriteLine();
             Console.WriteLine(qubit.Peek());
 
-            //Console.WriteLine();
-            //Console.WriteLine(qubit3.Peek());
             Console.ReadLine();
-
         }
     }
 }
