@@ -12,23 +12,6 @@ namespace Qubit8
     {
         static void Main(string[] args)
         {
-            //ComplexMatrix one = new ComplexMatrix().IdentityMatrix(4);
-            //ComplexMatrix two = new ComplexMatrix(2,2);
-            //two.Matrix[0][1] = new Complex(8);
-            //two.Matrix[1][0] = new Complex(7);
-            //two = one.Tensorize(two);
-
-            //for (int i = 0; i < two.RowCount; i++)
-            //{
-            //    for (int j = 0; j < two.ColumnCount; j++ )
-            //    {
-            //        Console.Write(two.Matrix[i][j] + "\t");
-            //    }
-            //    Console.WriteLine();
-            //}
-
-
-            Qubit qubit = new Qubit();
             ComplexMatrix stateArray = new ComplexMatrix(1, 2);
             stateArray.Matrix[0][0].Real = 0;
             stateArray.Matrix[0][1].Real = 1;
@@ -36,77 +19,32 @@ namespace Qubit8
             HadamardGate H = new HadamardGate();
             PauliXGate X = new PauliXGate();
 
-            //qubit.TransformState(H);
-
-            Qubit qubit2 = new Qubit();
-            //qubit2.TransformState(H);
-
-            Qubit qubit3 = new Qubit();
-            qubit3.TransformState(H);
+            Qubit qubit = new Qubit(0);
+            Qubit qubit2 = new Qubit(1);
+            Qubit qubit3 = new Qubit(2);
 
             //qubit.SetState(stateArray);
-            //qubit2.SetState(stateArray);
+            qubit2.SetState(stateArray);
             //qubit3.SetState(stateArray);
 
-            //qubit.JoinState(qubit2);
+            //qubit.TransformState(H);
+            qubit2.TransformState(H);
+            qubit3.TransformState(X);
+
+            qubit.JoinState(qubit2);
             //qubit2.JoinState(qubit3);
-            //qubit3.JoinState(qubit);
-            //qubit.JoinState(qubit);
+            //qubit3.JoinState(qubit2);
+            //qubit2.JoinState(qubit3);
+
             Console.WriteLine(qubit.Peek());
+            Console.WriteLine(qubit2.Peek());
+            Console.WriteLine(qubit3.Peek());
             Console.WriteLine();
 
             Console.WriteLine("-----------------------CNOT1----------------------");
-            qubit.TransformStateControlled(X, qubit3);
+            qubit3.TransformStateControlled(X, qubit2);
             Console.WriteLine(qubit.Peek());
             Console.WriteLine();
-
-            //Console.WriteLine("-----------------------X1----------------------");
-            //qubit.TransformState(X);
-            //Console.WriteLine(qubit.Peek());
-            //Console.WriteLine();
-
-            //Console.WriteLine("-----------------------X2----------------------");
-            //qubit2.TransformState(X);
-            //Console.WriteLine(qubit2.Peek());
-            //Console.WriteLine();
-
-            //Console.WriteLine("-----------------------X3----------------------");
-            //qubit3.TransformState(X);
-            //Console.WriteLine(qubit3.Peek());
-            //Console.WriteLine();
-
-            //Console.WriteLine("-----------------------Hadamard1----------------------");
-            //qubit.TransformState(H);
-            //Console.WriteLine(qubit.Peek());
-            //Console.WriteLine();
-
-            //Console.WriteLine("-----------------------Hadamard2----------------------");
-            //qubit2.TransformState(H);
-            //Console.WriteLine(qubit2.Peek());
-            //Console.WriteLine();
-
-            //Console.WriteLine("-----------------------Hadamard3----------------------");
-            //qubit3.TransformState(H);
-            //Console.WriteLine(qubit3.Peek());
-            //Console.WriteLine();
-
-            //Console.WriteLine(qubit.Measure());
-            //Console.WriteLine();
-            //Console.WriteLine(qubit2.Peek());
-
-            //Console.WriteLine(qubit2.Measure());
-            //Console.WriteLine();
-            //Console.WriteLine(qubit3.Peek());
-
-            //Console.WriteLine(qubit3.Measure());
-            //Console.WriteLine();
-            //Console.WriteLine(qubit.Peek());
-
-            //qubit.ResetState();
-            //Console.WriteLine();
-            //Console.WriteLine(qubit.Peek());
-            //Console.WriteLine(qubit2.Peek());
-            //Console.WriteLine(qubit3.Peek());
 
             Console.ReadLine();
         }

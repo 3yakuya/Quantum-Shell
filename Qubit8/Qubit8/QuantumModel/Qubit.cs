@@ -11,11 +11,26 @@ namespace Qubit8
     {
         public ComplexMatrix StateVector { get; private set; }
         public IList<Qubit> StateQubitList { get; private set; }
-        private int StateIndex { get; set; }
+        public int StateIndex { get; private set; }
 
-        public Qubit()
+        public Qubit(int index)
         {
+            this.StateIndex = index;
             this.Reset();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() + this.StateIndex;
         }
 
         public void ResetState()
@@ -26,22 +41,26 @@ namespace Qubit8
 
         public void JoinState(Qubit qubit)
         {
+            if (System.Math.Abs(this.StateIndex - qubit.StateIndex) != 1)
+                throw new ArgumentException("Only a consistent state may be formed.");
             if (this.StateQubitList.Contains(qubit))
                 return;
             var currentStateQubitList = new List<Qubit>(this.StateQubitList);
             currentStateQubitList.Add(qubit);
-            var newStateQubitList = GetStateQubitList(currentStateQubitList);
-            var qubitsToConsiderInState = FilterQubitsInCurrentState(this.StateQubitList, newStateQubitList);
-            qubitsToConsiderInState.Add(this);
 
-            this.StateQubitList = newStateQubitList;
+            var qubitsToConsiderInState = new List<Qubit>();
+            qubitsToConsiderInState.Add(this);
+            qubitsToConsiderInState.Add(qubit);
+            qubitsToConsiderInState = qubitsToConsiderInState.OrderBy(q => q.StateIndex).ToList();
+
+            this.StateQubitList = GetStateQubitList(currentStateQubitList);
             var fullStateVector = GetStateVector(qubitsToConsiderInState);
 
             foreach (Qubit stateQubit in StateQubitList)
             {
-                stateQubit.StateQubitList = newStateQubitList;
+                stateQubit.StateQubitList = this.StateQubitList;
                 stateQubit.StateVector = fullStateVector;
-                stateQubit.SetSelfStatePosition();
+                stateQubit.SetSelfStateIndex();
             }
         }
 
@@ -73,15 +92,15 @@ namespace Qubit8
             string stateString = "";
             int numberOfStates = StateVector.ColumnCount;
             int qubitsInState = Convert.ToString(StateVector.ColumnCount, 2).Length - 1;
-            bool firstStatePassed = false;
+            bool firstStatePeeked = false;
 
             for (int state = 0; state < numberOfStates; state++)
             {
                 if (StateVector.Matrix[0][state] != new Complex(0))
                 {
-                    if (firstStatePassed)
+                    if (firstStatePeeked)
                         stateString += " + ";
-                    firstStatePassed = true;
+                    firstStatePeeked = true;
                     stateString += StateVector.Matrix[0][state];
                     stateString += "|" + Convert.ToString(state, 2).PadLeft(qubitsInState, '0') + ">";
                 }
@@ -153,7 +172,7 @@ namespace Qubit8
 
             for (int qubitIndex = 0; qubitIndex < this.StateQubitList.Count; qubitIndex++)
             {
-                if (qubitIndex == this.StateIndex)
+                if (qubitIndex == StateQubitList.IndexOf(this))
                 {
                     stateOperator = gate.Transform.Tensorize(stateOperator);
                     qubitIndex += gate.QubitCount - 1;
@@ -174,12 +193,12 @@ namespace Qubit8
 
             this.StateQubitList = new List<Qubit>();
             this.StateQubitList.Add(this);
-            this.SetSelfStatePosition();
+            this.SetSelfStateIndex();
         }
 
-        private void SetSelfStatePosition()
+        private void SetSelfStateIndex()
         {
-            this.StateIndex = this.StateQubitList.IndexOf(this);
+            this.StateQubitList = StateQubitList.OrderBy(q => q.StateIndex).ToList();
         }
 
         private ComplexMatrix GetStateVector(IList<Qubit> qubitsToAddToState)
@@ -188,20 +207,15 @@ namespace Qubit8
             stateVector.Matrix[0][0] = new Complex(1);
             foreach (Qubit qubit in qubitsToAddToState)
             {
-                stateVector = stateVector.Tensorize(qubit.StateVector);
+                stateVector = qubit.StateVector.Tensorize(stateVector);
             }
             return stateVector;
-        }
-
-        private IList<Qubit> FilterQubitsInCurrentState(IList<Qubit> currentQubitList, IList<Qubit> extendedQubitList)
-        {
-            return extendedQubitList.Except(currentQubitList).ToList();
         }
 
         private IList<Qubit> GetStateQubitList(IList<Qubit> currentQubitStateList)
         {
             List<Qubit> stateQubitList = new List<Qubit>(currentQubitStateList);
-            foreach (Qubit qubit in this.StateQubitList)
+            foreach (Qubit qubit in currentQubitStateList)
             {
                 stateQubitList = stateQubitList.Union(qubit.StateQubitList).ToList();
             }

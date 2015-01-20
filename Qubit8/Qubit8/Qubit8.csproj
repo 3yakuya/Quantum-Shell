@@ -53,6 +53,9 @@
     <Compile Include="Math\ComplexMatrix.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuantumGates\RotationGates\R2ReversedGate.cs" />
+    <Compile Include="QuantumGates\RotationGates\R3ReversedGate.cs" />
+    <Compile Include="QuantumGates\RotationGates\R4ReversedGate.cs" />
     <Compile Include="QuantumModel\Qubit.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -43,7 +43,7 @@ namespace Qubit8.Math
         public ComplexMatrix Dot(ComplexMatrix second)
         {
             if (this.ColumnCount != second.RowCount)
-                throw (new ArgumentException());
+                throw (new ArgumentException("Incorrect matrix dimensions."));
             ComplexMatrix result = new ComplexMatrix(this.RowCount, second.ColumnCount);
 
             for (int columnInSecond = 0; columnInSecond < second.ColumnCount; columnInSecond++)
