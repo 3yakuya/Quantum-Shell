@@ -10,9 +10,11 @@ namespace Qubit8
 {
     class HadamardGate : QuantumGate
     {
-        public override ComplexMatrix Transform { get; protected set; }
+        public override int QubitCount { get; protected set; }
+        public override ComplexMatrix Transform { get; protected set; }
         public HadamardGate()
         {
+            this.QubitCount = 1;
             this.Transform = new ComplexMatrix(2, 2);
             Transform.Matrix[0][0].Real = 1 / System.Math.Sqrt(2);
             Transform.Matrix[0][1].Real = 1 / System.Math.Sqrt(2);

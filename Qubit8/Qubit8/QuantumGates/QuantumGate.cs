@@ -9,6 +9,7 @@ namespace Qubit8
 {
     abstract class QuantumGate
     {
+        public virtual int QubitCount { get; protected set; }
         public virtual ComplexMatrix Transform { get; protected set; }
     }
 }

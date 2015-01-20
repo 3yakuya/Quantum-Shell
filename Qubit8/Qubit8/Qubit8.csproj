@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="QuantumGates\HadamardGate.cs" />
+    <Compile Include="QuantumGates\PauliXGate.cs" />
     <Compile Include="QuantumGates\QuantumGate.cs" />
     <Compile Include="Math\Complex.cs" />
     <Compile Include="Math\ComplexMatrix.cs" />

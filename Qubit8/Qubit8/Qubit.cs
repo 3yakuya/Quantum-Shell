@@ -51,8 +51,9 @@ namespace Qubit8
                 qubit.StateVector = stateVector;
         }
 
-        public void TransformState(ComplexMatrix quantumOperator)
+        public void TransformState(QuantumGate gate)
         {
+            ComplexMatrix quantumOperator = BuildStateQuantumOperator(gate);
             ComplexMatrix newStateVector = this.StateVector.Dot(quantumOperator);
             SetState(newStateVector);
         }
@@ -96,12 +97,33 @@ namespace Qubit8
             {
                 NormalizeStateVector();
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 return -1;
             }
             return result;
         }
+
+        private ComplexMatrix BuildStateQuantumOperator(QuantumGate gate)
+        {
+            ComplexMatrix stateOperator = new ComplexMatrix();
+            stateOperator.Matrix[0][0].Real = 1;
+            ComplexMatrix identity = new ComplexMatrix().IdentityMatrix(2);
+
+            for (int qubitIndex = 0; qubitIndex < this.StateQubitList.Count; qubitIndex++)
+            {
+                if (qubitIndex == this.statePosition)
+                {
+                    stateOperator = gate.Transform.Tensorize(stateOperator);
+                    qubitIndex += gate.QubitCount - 1;
+                }
+                else
+                {
+                    stateOperator = identity.Tensorize(stateOperator);
+                }
+            }
+            return stateOperator;
+        } 
 
         private void Reset()
         {

@@ -1,4 +1,5 @@
 ﻿using Qubit8.Math;
+using Qubit8.QuantumGates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,20 +30,55 @@ namespace Qubit8
 
             Qubit qubit = new Qubit();
             ComplexMatrix stateArray = new ComplexMatrix(1, 2);
+            stateArray.Matrix[0][0].Real = 0;
+            stateArray.Matrix[0][1].Real = 1;
+            qubit.SetState(stateArray);
+
             HadamardGate H = new HadamardGate();
-            qubit.TransformState(H.Transform);
+            PauliXGate X = new PauliXGate();
+            //qubit.TransformState(H);
 
             Qubit qubit2 = new Qubit();
-            qubit2.TransformState(H.Transform);
+            //qubit2.TransformState(H);
 
             Qubit qubit3 = new Qubit();
-            qubit3.TransformState(H.Transform);
+            //qubit3.TransformState(H);
 
             qubit.JoinState(qubit2);
             qubit2.JoinState(qubit3);
             qubit3.JoinState(qubit);
             qubit.JoinState(qubit);
             Console.WriteLine(qubit.Peek());
+            Console.WriteLine();
+
+            Console.WriteLine("-----------------------Hadamard1----------------------");
+            qubit.TransformState(X);
+            Console.WriteLine(qubit.Peek());
+            Console.WriteLine();
+
+            Console.WriteLine("-----------------------Hadamard2----------------------");
+            qubit2.TransformState(X);
+            Console.WriteLine(qubit2.Peek());
+            Console.WriteLine();
+
+            Console.WriteLine("-----------------------Hadamard3----------------------");
+            qubit3.TransformState(X);
+            Console.WriteLine(qubit3.Peek());
+            Console.WriteLine();
+
+            Console.WriteLine("-----------------------Hadamard1----------------------");
+            qubit.TransformState(H);
+            Console.WriteLine(qubit.Peek());
+            Console.WriteLine();
+
+            Console.WriteLine("-----------------------Hadamard2----------------------");
+            qubit2.TransformState(H);
+            Console.WriteLine(qubit2.Peek());
+            Console.WriteLine();
+
+            Console.WriteLine("-----------------------Hadamard3----------------------");
+            qubit3.TransformState(H);
+            Console.WriteLine(qubit3.Peek());
             Console.WriteLine();
 
             Console.WriteLine(qubit.Measure());
