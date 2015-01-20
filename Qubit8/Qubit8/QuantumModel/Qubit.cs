@@ -11,11 +11,11 @@ namespace Qubit8
     {
         public ComplexMatrix StateVector { get; private set; }
         public IList<Qubit> StateQubitList { get; private set; }
-        public int StateIndex { get; private set; }
+        public int QubitIndex { get; private set; }
 
         public Qubit(int index)
         {
-            this.StateIndex = index;
+            this.QubitIndex = index;
             this.Reset();
         }
 
@@ -30,7 +30,7 @@ namespace Qubit8
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() + this.StateIndex;
+            return base.GetHashCode() + this.QubitIndex;
         }
 
         public void ResetState()
@@ -41,17 +41,19 @@ namespace Qubit8
 
         public void JoinState(Qubit qubit)
         {
-            if (System.Math.Abs(this.StateIndex - qubit.StateIndex) != 1)
-                throw new ArgumentException("Only a consistent state may be formed.");
             if (this.StateQubitList.Contains(qubit))
                 return;
+
+            if (System.Math.Abs(this.QubitIndex - qubit.QubitIndex) != 1)
+                throw new ArgumentException("Only a consistent state may be formed.");
+
             var currentStateQubitList = new List<Qubit>(this.StateQubitList);
             currentStateQubitList.Add(qubit);
 
             var qubitsToConsiderInState = new List<Qubit>();
             qubitsToConsiderInState.Add(this);
             qubitsToConsiderInState.Add(qubit);
-            qubitsToConsiderInState = qubitsToConsiderInState.OrderBy(q => q.StateIndex).ToList();
+            qubitsToConsiderInState = qubitsToConsiderInState.OrderBy(q => q.QubitIndex).ToList();
 
             this.StateQubitList = GetStateQubitList(currentStateQubitList);
             var fullStateVector = GetStateVector(qubitsToConsiderInState);
@@ -80,7 +82,7 @@ namespace Qubit8
         public void TransformStateControlled(QuantumGate gate, Qubit controlQubit)
         {
             if (controlQubit == this)
-                throw new ArgumentException("Target and control qubits can not be the same.");
+                throw new ArgumentException("Target qubit can not be used to control itself.");
             JoinState(controlQubit);
             ComplexMatrix controlledOperator = BuildControlledQuantumOperator(gate, controlQubit, this);
             ComplexMatrix newStateVector = this.StateVector.Dot(controlledOperator);
@@ -136,26 +138,28 @@ namespace Qubit8
         private ComplexMatrix BuildControlledQuantumOperator(QuantumGate gate, Qubit control, Qubit target)
         {
             int stateSize = StateVector.Matrix[0].Count;
+            int controlBit = StateQubitList.IndexOf(control);
+            int targetBit = StateQubitList.IndexOf(target);
             ComplexMatrix controlledTransform = new ComplexMatrix().IdentityMatrix(stateSize);
 
             for (int row = 0; row < stateSize; row++)
             {
-                if (BitIsSet(row, control.StateIndex))
+                if (BitIsSet(row, controlBit))
                 {
                     for (int column = 0; column < stateSize; column++)
                     {
                         bool correctState = true;
                         for (int stateBit = 0; (stateBit < stateSize) && correctState; stateBit++)
                         {
-                            if ((BitIsSet(column, stateBit) != BitIsSet(row, stateBit)) && (stateBit != target.StateIndex))
+                            if ((BitIsSet(column, stateBit) != BitIsSet(row, stateBit)) && (stateBit != targetBit))
                             {
                                     correctState = false;
                             }
                         }
                         if (correctState)
                         {
-                            int transformRow = Convert.ToInt32(BitIsSet(row, target.StateIndex));
-                            int transformColumn = Convert.ToInt32(BitIsSet(column, target.StateIndex));
+                            int transformRow = Convert.ToInt32(BitIsSet(row, targetBit));
+                            int transformColumn = Convert.ToInt32(BitIsSet(column, targetBit));
                             controlledTransform.Matrix[row][column] = gate.Transform.Matrix[transformRow][transformColumn]; 
                         }
                     }
@@ -198,7 +202,7 @@ namespace Qubit8
 
         private void SetSelfStateIndex()
         {
-            this.StateQubitList = StateQubitList.OrderBy(q => q.StateIndex).ToList();
+            this.StateQubitList = StateQubitList.OrderBy(q => q.QubitIndex).ToList();
         }
 
         private ComplexMatrix GetStateVector(IList<Qubit> qubitsToAddToState)
@@ -230,9 +234,10 @@ namespace Qubit8
         private double GetProbabilityOfMeasuringZero()
         {
             double probabilityOfZero = 0;
+            int qubitIndex = StateQubitList.IndexOf(this);
             for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
-                if (!BitIsSet(stateIndex, StateIndex))
+                if (!BitIsSet(stateIndex, qubitIndex))
                     probabilityOfZero += Complex.Power(StateVector.Matrix[0][stateIndex], 2).Real;
             }
             return probabilityOfZero;
@@ -240,10 +245,11 @@ namespace Qubit8
 
         private void ClearImpossibleStates(int measuredValue)
         {
+            int qubitIndex = StateQubitList.IndexOf(this);
             for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
-                if ((BitIsSet(stateIndex, StateIndex) && measuredValue == 0) ||
-                    (!BitIsSet(stateIndex, StateIndex) && measuredValue == 1))
+                if ((BitIsSet(stateIndex, qubitIndex) && measuredValue == 0) ||
+                    (!BitIsSet(stateIndex, qubitIndex) && measuredValue == 1))
                     StateVector.Matrix[0][stateIndex] = new Complex(0);
             }
         }

@@ -26,7 +26,7 @@ namespace Qubit8.Math
             if (this.Real == 0 && this.Imaginary == 0)
                 return "0";
 
-            string stringRepresentation = "";
+            string stringRepresentation = "(";
             if (this.Real != 0)
             {
                 stringRepresentation += this.Real.ToString();
@@ -38,6 +38,7 @@ namespace Qubit8.Math
                     stringRepresentation += " + ";
                 stringRepresentation += this.Imaginary.ToString() + "i";
             }
+            stringRepresentation += ")";
             return stringRepresentation;
         }
 
