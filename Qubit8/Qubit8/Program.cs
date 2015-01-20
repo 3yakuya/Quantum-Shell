@@ -57,8 +57,7 @@ namespace Qubit8
             Console.WriteLine();
 
             Console.WriteLine("-----------------------CNOT1----------------------");
-            qubit3.TransformState(H);
-            qubit2.TransformState(CNOT);
+            qubit3.TransformStateControlled(X, qubit2);
             Console.WriteLine(qubit.Peek());
             Console.WriteLine();
 

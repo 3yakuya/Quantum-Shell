@@ -58,6 +58,15 @@ namespace Qubit8
             SetState(newStateVector);
         }
 
+        public void TransformStateControlled(QuantumGate gate, Qubit controlQubit)
+        {
+            if (controlQubit == this)
+                throw new ArgumentException("Target and control qubits can not be the same.");
+            ComplexMatrix controlledOperator = BuildControlledQuantumGate(gate, controlQubit, this);
+            ComplexMatrix newStateVector = this.StateVector.Dot(controlledOperator);
+            SetState(newStateVector);
+        }
+
         public string Peek()
         {
             string stateString = "";
@@ -102,6 +111,39 @@ namespace Qubit8
                 return -1;
             }
             return result;
+        }
+
+        private ComplexMatrix BuildControlledQuantumGate(QuantumGate gate, Qubit control, Qubit target)
+        {
+            int stateSize = StateVector.Matrix[0].Count;
+            ComplexMatrix controlledTransform = new ComplexMatrix().IdentityMatrix(stateSize);
+
+            for (int row = 0; row < stateSize; row++)
+            {
+                if (BitIsSet(row, control.statePosition))
+                {
+                    for (int column = 0; column < stateSize; column++)
+                    {
+                        bool correctState = true;
+                        for (int stateBit = 0; (stateBit < stateSize) && correctState; stateBit++)
+                        {
+                            if ((stateBit != target.statePosition) &&
+                            (BitIsSet(column, stateBit) != BitIsSet(row, stateBit)))
+                            {
+                                    correctState = false;
+                            }
+                        }
+                        if (correctState)
+                        {
+                            int transformRow = Convert.ToInt32(BitIsSet(row, target.statePosition));
+                            int transformColumn = Convert.ToInt32(BitIsSet(column, target.statePosition));
+                            controlledTransform.Matrix[row][column] = gate.Transform.Matrix[transformRow][transformColumn]; 
+                        }
+                    }
+                }
+            }
+
+            return controlledTransform;
         }
 
         private ComplexMatrix BuildStateQuantumOperator(QuantumGate gate)
