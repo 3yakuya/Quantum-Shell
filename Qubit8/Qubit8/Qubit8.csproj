@@ -42,8 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HadamardGate.cs" />
-    <Compile Include="IQuantumGate.cs" />
+    <Compile Include="QuantumGates\HadamardGate.cs" />
+    <Compile Include="QuantumGates\QuantumGate.cs" />
     <Compile Include="Math\Complex.cs" />
     <Compile Include="Math\ComplexMatrix.cs" />
     <Compile Include="Program.cs" />

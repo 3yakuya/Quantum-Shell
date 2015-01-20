@@ -48,7 +48,13 @@ namespace Qubit8
         public void SetState(ComplexMatrix stateVector)
         {
             foreach (Qubit qubit in this.StateQubitList)
-                this.StateVector = stateVector;
+                qubit.StateVector = stateVector;
+        }
+
+        public void TransformState(ComplexMatrix quantumOperator)
+        {
+            ComplexMatrix newStateVector = this.StateVector.Dot(quantumOperator);
+            SetState(newStateVector);
         }
 
         public string Peek()
@@ -80,13 +86,20 @@ namespace Qubit8
             double randomProbability = random.NextDouble();
 
             int result;
-            if (randomProbability > probability0)
+            if (randomProbability < probability0)
                 result = 0;
             else
                 result = 1;
 
             ClearImpossibleStates(result);
-            NormalizeStateVector();
+            try
+            {
+                NormalizeStateVector();
+            }
+            catch (ArgumentException e)
+            {
+                return -1;
+            }
             return result;
         }
 

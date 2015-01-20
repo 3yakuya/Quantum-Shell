@@ -29,21 +29,14 @@ namespace Qubit8
 
             Qubit qubit = new Qubit();
             ComplexMatrix stateArray = new ComplexMatrix(1, 2);
-            stateArray.Matrix[0][0] = new Complex(0.7);
-            stateArray.Matrix[0][1] = new Complex(0.7);
-            qubit.SetState(stateArray);
+            HadamardGate H = new HadamardGate();
+            qubit.TransformState(H.Transform);
 
             Qubit qubit2 = new Qubit();
-            ComplexMatrix stateArray2 = new ComplexMatrix(1, 2);
-            stateArray2.Matrix[0][0] = new Complex(0.7);
-            stateArray2.Matrix[0][1] = new Complex(0.7);
-            qubit2.SetState(stateArray2);
+            qubit2.TransformState(H.Transform);
 
             Qubit qubit3 = new Qubit();
-            ComplexMatrix stateArray3 = new ComplexMatrix(1, 2);
-            stateArray3.Matrix[0][0] = new Complex(0.7);
-            stateArray3.Matrix[0][1] = new Complex(0.7);
-            qubit3.SetState(stateArray2);
+            qubit3.TransformState(H.Transform);
 
             qubit.JoinState(qubit2);
             qubit2.JoinState(qubit3);
