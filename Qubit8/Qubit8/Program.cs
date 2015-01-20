@@ -35,7 +35,6 @@ namespace Qubit8
 
             HadamardGate H = new HadamardGate();
             PauliXGate X = new PauliXGate();
-            CNOTGate CNOT = new CNOTGate();
 
             //qubit.TransformState(H);
 
@@ -49,8 +48,8 @@ namespace Qubit8
             //qubit2.SetState(stateArray);
             //qubit3.SetState(stateArray);
 
-            qubit.JoinState(qubit2);
-            qubit2.JoinState(qubit3);
+            //qubit.JoinState(qubit2);
+            //qubit2.JoinState(qubit3);
             //qubit3.JoinState(qubit);
             //qubit.JoinState(qubit);
             Console.WriteLine(qubit.Peek());

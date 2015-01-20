@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="QuantumGates\CNOTGate.cs" />
     <Compile Include="QuantumGates\HadamardGate.cs" />
     <Compile Include="QuantumGates\PauliXGate.cs" />
     <Compile Include="QuantumGates\QuantumGate.cs" />

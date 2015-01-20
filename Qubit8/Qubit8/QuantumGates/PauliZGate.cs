@@ -7,19 +7,18 @@ using System.Threading.Tasks;
 
 namespace Qubit8.QuantumGates
 {
-    class CNOTGate : QuantumGate
+    class PauliZGate : QuantumGate
     {
         public override int QubitCount { get; protected set; }
         public override ComplexMatrix Transform { get; protected set; }
-
-        public CNOTGate()
+        public PauliZGate()
         {
-            this.QubitCount = 2;
-            this.Transform = new ComplexMatrix(4, 4);
+            this.QubitCount = 1;
+            this.Transform = new ComplexMatrix(2, 2);
             Transform.Matrix[0][0].Real = 1;
-            Transform.Matrix[1][1].Real = 1;
-            Transform.Matrix[2][3].Real = 1;
-            Transform.Matrix[3][2].Real = 1;
+            Transform.Matrix[0][1].Real = 0;
+            Transform.Matrix[1][0].Real = 0;
+            Transform.Matrix[1][1].Real = -1;
         }
     }
 }
