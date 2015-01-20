@@ -9,13 +9,19 @@ namespace Qubit8
 {
     class Qubit
     {
-        public ComplexMatrix StateVector { get; set; }
+        public ComplexMatrix StateVector { get; private set; }
         public IList<Qubit> StateQubitList { get; private set; }
         private int statePosition = 0;
 
         public Qubit()
         {
             this.Reset();
+        }
+
+        public void ResetState()
+        {
+            foreach (Qubit qubit in this.StateQubitList)
+                qubit.Reset();
         }
 
         public void JoinState(Qubit qubit)
@@ -39,16 +45,10 @@ namespace Qubit8
             }
         }
 
-        public void Reset()
+        public void SetState(ComplexMatrix stateVector)
         {
-            this.StateVector = new ComplexMatrix(1, 2);
-            this.StateVector.Matrix[0][0] = new Complex(1);
-            this.StateVector.Matrix[0][1] = new Complex(0);
-
-            this.StateQubitList = new List<Qubit>();
-            this.StateQubitList.Add(this);
-            this.SetSelfStatePosition();
-
+            foreach (Qubit qubit in this.StateQubitList)
+                this.StateVector = stateVector;
         }
 
         public string Peek()
@@ -69,7 +69,7 @@ namespace Qubit8
                     stateString += "|" + Convert.ToString(state, 2).PadLeft(qubitsInState, '0') + ">";
                 }
             }
-                return stateString;
+            return stateString;
         }
 
         public int Measure()
@@ -88,6 +88,17 @@ namespace Qubit8
             ClearImpossibleStates(result);
             NormalizeStateVector();
             return result;
+        }
+
+        private void Reset()
+        {
+            this.StateVector = new ComplexMatrix(1, 2);
+            this.StateVector.Matrix[0][0] = new Complex(1);
+            this.StateVector.Matrix[0][1] = new Complex(0);
+
+            this.StateQubitList = new List<Qubit>();
+            this.StateQubitList.Add(this);
+            this.SetSelfStatePosition();
         }
 
         private void SetSelfStatePosition()
