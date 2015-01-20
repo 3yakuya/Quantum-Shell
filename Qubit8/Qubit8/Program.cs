@@ -44,7 +44,7 @@ namespace Qubit8
             Qubit qubit3 = new Qubit();
             qubit3.TransformState(H);
 
-            qubit.SetState(stateArray);
+            //qubit.SetState(stateArray);
             //qubit2.SetState(stateArray);
             //qubit3.SetState(stateArray);
 

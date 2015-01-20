@@ -5,21 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Qubit8.QuantumGates
+namespace Qubit8.QuantumGates.RotationGates
 {
-    class Pi8Gate : QuantumGate
+    class R4ReversedGate : QuantumGate
     {
         public override int QubitCount { get; protected set; }
         public override ComplexMatrix Transform { get; protected set; }
-        public Pi8Gate()
+        public R4ReversedGate()
         {
             this.QubitCount = 1;
             this.Transform = new ComplexMatrix(2, 2);
             Transform.Matrix[0][0].Real = 1;
             Transform.Matrix[0][1].Real = 0;
             Transform.Matrix[1][0].Real = 0;
-            Transform.Matrix[1][1].Real = 1 / System.Math.Sqrt(2);
-            Transform.Matrix[1][1].Imaginary = 1 / System.Math.Sqrt(2);
+            Transform.Matrix[1][1].Real = System.Math.Cos(System.Math.PI / 8);
+            Transform.Matrix[1][1].Imaginary = -System.Math.Sin(System.Math.PI / 8);
         }
     }
 }
