@@ -138,6 +138,7 @@ namespace Qubit8
         private ComplexMatrix BuildControlledQuantumOperator(QuantumGate gate, Qubit control, Qubit target)
         {
             int stateSize = StateVector.Matrix[0].Count;
+            int numberOfQubits = StateQubitList.Count;
             int controlBit = StateQubitList.IndexOf(control);
             int targetBit = StateQubitList.IndexOf(target);
             ComplexMatrix controlledTransform = new ComplexMatrix().IdentityMatrix(stateSize);
@@ -149,7 +150,7 @@ namespace Qubit8
                     for (int column = 0; column < stateSize; column++)
                     {
                         bool correctState = true;
-                        for (int stateBit = 0; (stateBit < stateSize) && correctState; stateBit++)
+                        for (int stateBit = 0; (stateBit < numberOfQubits) && correctState; stateBit++)
                         {
                             if ((BitIsSet(column, stateBit) != BitIsSet(row, stateBit)) && (stateBit != targetBit))
                             {
