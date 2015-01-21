@@ -25,6 +25,8 @@ namespace Qubit8.Services
         private R3ReversedGate R3 { get; set; }
         private R4ReversedGate R4 { get; set; }
 
+        int qubitReverseIndex = 7;
+
         public Interpreter()
         {
             ResetRegister();
@@ -100,6 +102,7 @@ namespace Qubit8.Services
                             scriptExecute = true;
                     }
                     command = reader.ReadLine();
+                    Console.Write(command + ": ");
                 }
 
                 if (HRegex.IsMatch(command))
@@ -107,7 +110,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(H);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(H);
                     }
                     catch (Exception)
                     {
@@ -119,7 +122,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(X);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(X);
                     }
                     catch (Exception)
                     {
@@ -131,7 +134,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(I);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(I);
                     }
                     catch (Exception)
                     {
@@ -143,7 +146,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(Y);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(Y);
                     }
                     catch (Exception)
                     {
@@ -155,7 +158,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(Z);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(Z);
                     }
                     catch (Exception)
                     {
@@ -167,7 +170,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(T);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(T);
                     }
                     catch (Exception)
                     {
@@ -179,7 +182,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(R2);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(R2);
                     }
                     catch (Exception)
                     {
@@ -191,7 +194,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(R3);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(R3);
                     }
                     catch (Exception)
                     {
@@ -203,7 +206,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(R4);
+                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(R4);
 
                     }
                     catch (Exception)
@@ -215,13 +218,13 @@ namespace Qubit8.Services
                 {
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     Console.WriteLine("Revealing " + qubitNumber + " qubit:");
-                    Console.WriteLine(QuantumRegister[qubitNumber].Peek() + "\n");
+                    Console.WriteLine(QuantumRegister[qubitReverseIndex - qubitNumber].Peek() + "\n");
                 }
                 else if (MeasureRegex.IsMatch(command))
                 {
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     Console.WriteLine("Measuring " + qubitNumber + " qubit:");
-                    Console.WriteLine(QuantumRegister[qubitNumber].Measure() + "\n");
+                    Console.WriteLine(QuantumRegister[qubitReverseIndex - qubitNumber].Measure() + "\n");
                 }
                 else if (JoinRegex.IsMatch(command))
                 {
@@ -239,7 +242,7 @@ namespace Qubit8.Services
                 {
                     int qubit = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     Console.WriteLine("\nThis will reset all qubits in consistent state with the selected one.\n");
-                    QuantumRegister[qubit].ResetState();
+                    QuantumRegister[qubitReverseIndex - qubit].ResetState();
                 }
                 else if (ControlledRegex.IsMatch(command))
                 {
@@ -333,12 +336,12 @@ namespace Qubit8.Services
             if (from < to)
             {
                 for (int qubitIndex = from; qubitIndex < to; qubitIndex++)
-                    QuantumRegister[qubitIndex].JoinState(QuantumRegister[qubitIndex + 1]);
+                    QuantumRegister[qubitReverseIndex - qubitIndex].JoinState(QuantumRegister[qubitReverseIndex - qubitIndex - 1]);
             }
             else
             {
                 for (int qubitIndex = to; qubitIndex < from; qubitIndex++)
-                    QuantumRegister[qubitIndex].JoinState(QuantumRegister[qubitIndex + 1]);
+                    QuantumRegister[qubitReverseIndex - qubitIndex].JoinState(QuantumRegister[qubitReverseIndex - qubitIndex - 1]);
             }
         }
 
@@ -354,7 +357,7 @@ namespace Qubit8.Services
                 Console.WriteLine("Qubit index not in [0, 7].");
                 return;
             }
-            if (QuantumRegister[qubitIndex].StateQubitList.Count > 1)
+            if (QuantumRegister[qubitReverseIndex - qubitIndex].StateQubitList.Count > 1)
             {
                 Console.WriteLine("Selected qubit is possibly in an entangled state (it can't be set explicitly).");
                 return;
@@ -362,7 +365,7 @@ namespace Qubit8.Services
 
             ComplexMatrix state = new ComplexMatrix(1, 2);
             state.Matrix[0][value].Real = 1;
-            QuantumRegister[qubitIndex].SetState(state);
+            QuantumRegister[qubitReverseIndex - qubitIndex].SetState(state);
         }
 
         private void ControlledOperation(int controlQubit, int targetQubit, string operation)
@@ -373,6 +376,8 @@ namespace Qubit8.Services
                 return;
             }
 
+            controlQubit = qubitReverseIndex - controlQubit;
+            targetQubit = qubitReverseIndex - targetQubit;
             try
             {
                 switch (operation)
