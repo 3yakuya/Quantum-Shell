@@ -57,6 +57,7 @@
     <Compile Include="QuantumGates\RotationGates\R3ReversedGate.cs" />
     <Compile Include="QuantumGates\RotationGates\R4ReversedGate.cs" />
     <Compile Include="QuantumModel\Qubit.cs" />
+    <Compile Include="Services\Interpreter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
