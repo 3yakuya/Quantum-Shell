@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Qubit8.Math
+namespace QuantumShell.Math
 {
     class Complex
     {

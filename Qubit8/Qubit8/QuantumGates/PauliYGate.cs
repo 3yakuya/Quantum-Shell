@@ -1,11 +1,11 @@
-﻿using Qubit8.Math;
+﻿using QuantumShell.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Qubit8.QuantumGates
+namespace QuantumShell.QuantumGates
 {
     class PauliYGate : QuantumGate
     {

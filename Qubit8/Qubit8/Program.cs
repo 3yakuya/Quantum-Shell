@@ -1,14 +1,14 @@
-﻿using Qubit8.Math;
-using Qubit8.QuantumGates;
-using Qubit8.QuantumGates.RotationGates;
-using Qubit8.Services;
+﻿using QuantumShell.Math;
+using QuantumShell.QuantumGates;
+using QuantumShell.QuantumGates.RotationGates;
+using QuantumShell.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Qubit8
+namespace QuantumShell
 {
     class Program
     {

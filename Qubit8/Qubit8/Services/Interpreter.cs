@@ -1,6 +1,6 @@
-﻿using Qubit8.Math;
-using Qubit8.QuantumGates;
-using Qubit8.QuantumGates.RotationGates;
+﻿using QuantumShell.Math;
+using QuantumShell.QuantumGates;
+using QuantumShell.QuantumGates.RotationGates;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Qubit8.Services
+namespace QuantumShell.Services
 {
     class Interpreter
     {
@@ -82,7 +82,7 @@ namespace Qubit8.Services
 
             StreamReader reader = null;
 
-            Console.WriteLine("Qubit8 (c) 2015 by Jakub Pilch");
+            Console.WriteLine("Quantum Shell (c) 2015 by Jakub Pilch");
             Console.WriteLine("Type \"help\" to see possible commands.");
 
             while (isRunning)
