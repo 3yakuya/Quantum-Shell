@@ -3,6 +3,7 @@ using Qubit8.QuantumGates;
 using Qubit8.QuantumGates.RotationGates;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,9 +27,7 @@ namespace Qubit8.Services
 
         public Interpreter()
         {
-            QuantumRegister = new Qubit[8];
-            for (int i = 0; i < 8; i++)
-                QuantumRegister[i] = new Qubit(i);
+            ResetRegister();
 
                 H = new HadamardGate();
             X = new PauliXGate();
@@ -44,6 +43,8 @@ namespace Qubit8.Services
         public void Run()
         {
             bool isRunning = true;
+            bool scriptMode = false;
+            bool scriptExecute = false;
 
             string HPattern = @"H\(\d\)";
             string XPattern = @"X\(\d\)";
@@ -59,6 +60,7 @@ namespace Qubit8.Services
             string JoinPattern = @"Join\(\d-\d\)";
             string SetPattern = @"Set\(\d,\d\)";
             string ResetPattern = @"Reset\(\d\)";
+            string ControlledPattern = @"c-[H|X|Y|Z|T|R2|R3|R4]\(\d,\d\)";
 
             Regex HRegex = new Regex(HPattern);
             Regex XRegex = new Regex(XPattern);
@@ -74,6 +76,9 @@ namespace Qubit8.Services
             Regex JoinRegex = new Regex(JoinPattern);
             Regex SetRegex = new Regex(SetPattern);
             Regex ResetRegex = new Regex(ResetPattern);
+            Regex ControlledRegex = new Regex(ControlledPattern);
+
+            StreamReader reader = null;
 
             Console.WriteLine("Qubit8 (c) 2015 by Jakub Pilch");
             Console.WriteLine("Type \"help\" to see possible commands.");
@@ -81,7 +86,22 @@ namespace Qubit8.Services
             while (isRunning)
             {
                 Console.Write("-> ");
-                string command = Console.ReadLine();
+                string command;
+                if (!scriptMode)
+                    command = Console.ReadLine();
+                else
+                {
+                    if (!scriptExecute)
+                    {
+                        string scriptCommand = Console.ReadLine();
+                        if (scriptCommand == "exit")
+                            break;
+                        if (scriptCommand == "run")
+                            scriptExecute = true;
+                    }
+                    command = reader.ReadLine();
+                }
+
                 if (HRegex.IsMatch(command))
                 {
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
@@ -183,7 +203,7 @@ namespace Qubit8.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitNumber].TransformState(H);
+                        QuantumRegister[qubitNumber].TransformState(R4);
 
                     }
                     catch (Exception)
@@ -221,6 +241,18 @@ namespace Qubit8.Services
                     Console.WriteLine("\nThis will reset all qubits in consistent state with the selected one.\n");
                     QuantumRegister[qubit].ResetState();
                 }
+                else if (ControlledRegex.IsMatch(command))
+                {
+                    string operation = command.Split('-')[1].ElementAt(0).ToString();
+                    string secondOperationChar = command.Split('-')[1].ElementAt(1).ToString();
+                    if (secondOperationChar != "(")
+                    {
+                        operation += secondOperationChar;
+                    }
+                    int target = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
+                    int control = int.Parse(command.Split('(')[1].ElementAt(2).ToString());
+                    ControlledOperation(control, target, operation.ToString());
+                }
                 else
                 {
                     switch (command)
@@ -230,29 +262,25 @@ namespace Qubit8.Services
                             break;
 
                         case "help":
-                            Console.WriteLine("Available commands:");
-                            Console.WriteLine("\t->H(qubitNumber)");
-                            Console.WriteLine("\t->X(qubitNumber)");
-                            Console.WriteLine("\t->I(qubitNumber)");
-                            Console.WriteLine("\t->Y(qubitNumber)");
-                            Console.WriteLine("\t->Z(qubitNumber)");
-                            Console.WriteLine("\t->T(qubitNumber)");
-                            Console.WriteLine("\t->R2(qubitNumber)");
-                            Console.WriteLine("\t->R3(qubitNumber)");
-                            Console.WriteLine("\t->R4(qubitNumber)");
-                            Console.WriteLine("\t->Peek(qubitNumber)");
-                            Console.WriteLine("\t->Measure(qubitNumber)");
-                            Console.WriteLine("\t->Join(fromQubit-toQubit)");
-                            Console.WriteLine("\t->Reset(qubitNumber)");
-                            Console.WriteLine("\t->Reset");
-                            Console.WriteLine("\t->exit");
-                            Console.WriteLine("\t->help");
-                            Console.WriteLine("\nRemember: qubits are numbered from right to left.");
-                            Console.WriteLine("Qubits are indexed from 0 to 7.");
+                            ShowHelp();
                             break;
 
                         case "exit":
                             isRunning = false;
+                            Console.WriteLine("Thanks for usage! Press any key to quit.");
+                            Console.ReadLine();
+                            break;
+
+                        case "load":
+                            Console.WriteLine("Type in a script path:\n");
+                            string path = Console.ReadLine();
+                            reader = LoadScript(path);
+                            if (reader != null)
+                            {
+                                Console.WriteLine("Entering script step-by-step mode.");
+                                Console.WriteLine("Type \"exit\" to quit or \"run\" to run continuously.");
+                                scriptMode = true;
+                            }
                             break;
 
                         default:
@@ -263,12 +291,35 @@ namespace Qubit8.Services
             }
         }
 
+        private void ShowHelp()
+        {
+            Console.WriteLine("Available commands:");
+            Console.WriteLine("\t->H(qubitNumber)");
+            Console.WriteLine("\t->X(qubitNumber)");
+            Console.WriteLine("\t->I(qubitNumber)");
+            Console.WriteLine("\t->Y(qubitNumber)");
+            Console.WriteLine("\t->Z(qubitNumber)");
+            Console.WriteLine("\t->T(qubitNumber)");
+            Console.WriteLine("\t->R2(qubitNumber)");
+            Console.WriteLine("\t->R3(qubitNumber)");
+            Console.WriteLine("\t->R4(qubitNumber)");
+            Console.WriteLine("\t->c-G(control,target) (G can be any gate from above).");
+            Console.WriteLine("\t->Peek(qubitNumber)");
+            Console.WriteLine("\t->Measure(qubitNumber)");
+            Console.WriteLine("\t->Join(fromQubit-toQubit)");
+            Console.WriteLine("\t->Reset(qubitNumber)");
+            Console.WriteLine("\t->Reset");
+            Console.WriteLine("\t->exit");
+            Console.WriteLine("\t->help");
+            Console.WriteLine("\nRemember: qubits are numbered from right to left.");
+            Console.WriteLine("Qubits are indexed from 0 to 7.");
+        }
         private void ResetRegister()
         {
             Console.WriteLine("\nResetting the quantum register...\n");
-            this.QuantumRegister = new Qubit[8];
+            QuantumRegister = new Qubit[8];
             for (int i = 0; i < 8; i++)
-                QuantumRegister[i] = new Qubit(i);
+                QuantumRegister[i] = new Qubit(7 - i);
         }
 
         private void JoinQubitsInRegister(int from, int to)
@@ -312,6 +363,81 @@ namespace Qubit8.Services
             ComplexMatrix state = new ComplexMatrix(1, 2);
             state.Matrix[0][value].Real = 1;
             QuantumRegister[qubitIndex].SetState(state);
+        }
+
+        private void ControlledOperation(int controlQubit, int targetQubit, string operation)
+        {
+            if (controlQubit > 7 || controlQubit < 0 || targetQubit > 7 || targetQubit < 0 || targetQubit == controlQubit)
+            {
+                Console.WriteLine("Qubit can not be used to control itself.");
+                return;
+            }
+
+            try
+            {
+                switch (operation)
+                {
+                    case "H":
+                        QuantumRegister[targetQubit].TransformStateControlled(H, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "X":
+                        QuantumRegister[targetQubit].TransformStateControlled(X, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "I":
+                        QuantumRegister[targetQubit].TransformStateControlled(I, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "Y":
+                        QuantumRegister[targetQubit].TransformStateControlled(Y, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "Z":
+                        QuantumRegister[targetQubit].TransformStateControlled(Z, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "T":
+                        QuantumRegister[targetQubit].TransformStateControlled(T, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "R2":
+                        QuantumRegister[targetQubit].TransformStateControlled(R2, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "R3":
+                        QuantumRegister[targetQubit].TransformStateControlled(R3, QuantumRegister[controlQubit]);
+                        break;
+
+                    case "R4":
+                        QuantumRegister[targetQubit].TransformStateControlled(R4, QuantumRegister[controlQubit]);
+                        break;
+
+                    default:
+                        Console.WriteLine("Unsupported gate.");
+                        break;
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Only qubits in a consistent state may be used in a controlled operation.");
+                Console.WriteLine("Consistent states may not contain any gaps.");
+                return;
+            }
+        }
+
+        private StreamReader LoadScript(string path)
+        {
+            try
+            {
+                return new StreamReader(path);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
     }
 }
