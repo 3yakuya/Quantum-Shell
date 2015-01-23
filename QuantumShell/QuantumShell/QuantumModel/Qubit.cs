@@ -96,11 +96,11 @@ namespace QuantumShell
             if (controlRepresentant.QubitIndex < this.QubitIndex)
                 throw new ArgumentException("Control register must be higher than target register.");
 
+            int controlRegisterSize = controlRepresentant.StateQubitList.Count;
             JoinState(controlRepresentant);
-            ComplexMatrix fullStateOperator = BuildDirectedTransform(stateTransform, f, controlRepresentant);
+            ComplexMatrix fullStateOperator = BuildDirectedTransform(stateTransform, f, controlRegisterSize);
             ComplexMatrix newStateVector = this.StateVector.Dot(fullStateOperator);
             SetState(newStateVector);
-            //NormalizeStateVector();
         }
 
 
@@ -150,74 +150,43 @@ namespace QuantumShell
             return result;
         }
 
-        private ComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant)
+        private ComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int controlRegisterSize)
         {
             int stateSize = StateVector.Matrix[0].Count;
             ComplexMatrix directedMultiQubitTransform = new ComplexMatrix(stateSize, stateSize);
-            //Complex amplitude = GetEqualWeightAmplitude(GetPossibleStatesCount(controlRepresentant.StateVector));
             Complex amplitude = new Complex(1);
 
             for (int stateColumn = 0; stateColumn < stateSize; stateColumn++)
             {
-                int controlStateIndex = GetHigherRegisterState(stateColumn, StateQubitList.Count);
-                int targetStateIndex = GetLowerRegisterState(stateColumn, StateQubitList.Count);
+                int controlStateIndex = GetHighRegisterState(stateColumn, controlRegisterSize);
+                int targetStateIndex = GetLowRegisterState(stateColumn, controlRegisterSize);
 
                 int processedControlParameter = f(controlStateIndex);
                 targetStateIndex = stateTransform(targetStateIndex, processedControlParameter);
                 if (targetStateIndex < 0 || targetStateIndex > (int) System.Math.Pow(2, StateQubitList.Count))
                     throw new ArgumentException("Function processing the directed qubit returns incorrect values.");
 
-                int registerStateIndex = GetCompleteRegisterState(controlStateIndex, targetStateIndex, StateQubitList.Count);
+                int registerStateIndex = GetCompleteRegisterState(controlStateIndex, targetStateIndex, controlRegisterSize);
                 directedMultiQubitTransform.Matrix[stateColumn][registerStateIndex] = amplitude;
             }
             return directedMultiQubitTransform;
         }
 
-        private int GetCompleteRegisterState(int higherRegisterState, int lowerRegisterState, int qubitInStateCount)
+        private int GetCompleteRegisterState(int highRegisterState, int lowRegisterState, int highRegisterSize)
         {
-            int completeRegisterState = higherRegisterState << (qubitInStateCount / 2);
-            completeRegisterState += lowerRegisterState;
+            int completeRegisterState = highRegisterState << highRegisterSize;
+            completeRegisterState += lowRegisterState;
             return completeRegisterState;
         }
 
-        private int GetHigherRegisterState(int joinedStateIndex, int qubitsInStateCount)
+        private int GetHighRegisterState(int joinedStateIndex, int highRegisterSize)
         {
-            return joinedStateIndex >> (qubitsInStateCount / 2);
+            return joinedStateIndex >> highRegisterSize;
         }
 
-        private int GetLowerRegisterState(int joinedStateIndex, int qubitsInStateCount)
+        private int GetLowRegisterState(int joinedStateIndex, int highRegisterSize)
         {
-            return joinedStateIndex % (int) System.Math.Pow(2, qubitsInStateCount / 2);
-        }
-
-        private IList<int> GetStatesAllPossibleFunctionValues(Func<int, int> f, ComplexMatrix stateVector)
-        {
-            List<int> possibleFunctionValues = new List<int>();
-            for (int stateIndex = 0; stateIndex < stateVector.Matrix[0].Count; stateIndex++)
-            {
-                Complex amplitude = stateVector.Matrix[0][stateIndex];
-                if (amplitude.Real != 0 || amplitude.Imaginary != 0)
-                {
-                    possibleFunctionValues.Add(f(stateIndex));
-                }
-            }
-            return possibleFunctionValues;
-        }
-
-        private Complex GetEqualWeightAmplitude(int possibleStatesCount)
-        {
-            return new Complex(1 / System.Math.Sqrt(possibleStatesCount));
-        }
-
-        private int GetPossibleStatesCount(ComplexMatrix stateVector) 
-        {
-            int possibleStatesCount = 0;
-            foreach (Complex amplitude in stateVector.Matrix[0])
-            {
-                if (amplitude.Real != 0 || amplitude.Imaginary != 0)
-                    possibleStatesCount++;
-            }
-            return possibleStatesCount;
+            return joinedStateIndex % (int) System.Math.Pow(2, highRegisterSize);
         }
 
         private ComplexMatrix BuildControlledQuantumOperator(QuantumGate gate, Qubit control, Qubit target)

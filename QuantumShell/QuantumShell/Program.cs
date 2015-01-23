@@ -21,8 +21,10 @@ namespace QuantumShell
             register[2].TransformState(new HadamardGate());
             register[3].TransformState(new HadamardGate());
 
-            register[0].JoinState(register[1]);
+            register[1].TransformState(new PauliXGate());
+            //register[1].TransformState(new HadamardGate());
 
+            register[0].JoinState(register[1]);
             register[2].JoinState(register[3]);
 
             Console.WriteLine(register[0].Peek());
@@ -41,7 +43,7 @@ namespace QuantumShell
 
         private static int Xor(int x, int y)
         {
-            return x & y;
+            return x ^ y;
         }
 
         private static int f(int x)
