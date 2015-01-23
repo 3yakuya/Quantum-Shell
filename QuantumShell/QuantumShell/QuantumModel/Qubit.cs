@@ -89,14 +89,14 @@ namespace QuantumShell
             SetState(newStateVector);
         }
 
-        public void TransformMultiStateControlled(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant)
+        public void TransformMultiStateDirected(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant)
         {
             if (controlRepresentant.StateVector == this.StateVector)
                 throw new ArgumentException("Target and control registers must be separate.");
             if (controlRepresentant.QubitIndex < this.QubitIndex)
                 throw new ArgumentException("Control register must be higher than target register.");
 
-            ComplexMatrix fullStateOperator = BuildMultiQubitOperator(stateTransform, f, controlRepresentant, this);
+            ComplexMatrix fullStateOperator = BuildiDirectedOperator(stateTransform, f, controlRepresentant, this);
             JoinState(controlRepresentant);
             ComplexMatrix newStateVector = this.StateVector.Dot(fullStateOperator);
             SetState(newStateVector);
@@ -149,14 +149,14 @@ namespace QuantumShell
             return result;
         }
 
-        private ComplexMatrix BuildMultiQubitOperator(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant, Qubit targetRepresentant)
+        private ComplexMatrix BuildiDirectedOperator(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant, Qubit targetRepresentant)
         {
-            ComplexMatrix targetOperator = BuildMultiQubitControlTransform(stateTransform, f, controlRepresentant, targetRepresentant);
+            ComplexMatrix targetOperator = BuildDirectedTransform(stateTransform, f, controlRepresentant, targetRepresentant);
             ComplexMatrix controlOperator = new ComplexMatrix().IdentityMatrix(controlRepresentant.StateVector.Matrix[0].Count);
             return controlOperator.Tensorize(targetOperator);
         }
 
-        private ComplexMatrix BuildMultiQubitControlTransform(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant, Qubit targetRepresentant)
+        private ComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant, Qubit targetRepresentant)
         {
             int stateSize = targetRepresentant.StateVector.Matrix[0].Count;
             ComplexMatrix multiQubitTransform = new ComplexMatrix(stateSize, stateSize);
@@ -167,8 +167,9 @@ namespace QuantumShell
             {
                 foreach (int functionValue in possibleFunctionValues)
                 {
-                    int stateIndex = stateTransform(stateColumn, functionValue % stateSize);
-                    multiQubitTransform.Matrix[stateIndex][stateColumn] = amplitude;
+                    int stateIndex = stateTransform(stateColumn, functionValue);
+                    int normalizedStateIndex = System.Math.Abs(stateIndex % stateSize);
+                    multiQubitTransform.Matrix[normalizedStateIndex][stateColumn] = amplitude;
                 }
             }
             return multiQubitTransform;
