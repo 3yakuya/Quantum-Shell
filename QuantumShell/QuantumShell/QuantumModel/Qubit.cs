@@ -95,10 +95,12 @@ namespace QuantumShell
                 throw new ArgumentException("Target and control registers must be separate.");
             if (controlRepresentant.QubitIndex < this.QubitIndex)
                 throw new ArgumentException("Control register must be higher than target register.");
+            if (controlRepresentant.StateQubitList.Count < this.StateQubitList.Count)
+                throw new ArgumentException("Control register must contain at least as many qubits as target register.");
 
-            int controlRegisterSize = controlRepresentant.StateQubitList.Count;
+            int targetRegisterSize = this.StateQubitList.Count;
             JoinState(controlRepresentant);
-            ComplexMatrix fullStateOperator = BuildDirectedTransform(stateTransform, f, controlRegisterSize);
+            ComplexMatrix fullStateOperator = BuildDirectedTransform(stateTransform, f, targetRegisterSize);
             ComplexMatrix newStateVector = this.StateVector.Dot(fullStateOperator);
             SetState(newStateVector);
         }
@@ -150,7 +152,7 @@ namespace QuantumShell
             return result;
         }
 
-        private ComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int controlRegisterSize)
+        private ComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int targetRegisterSize)
         {
             int stateSize = StateVector.Matrix[0].Count;
             ComplexMatrix directedMultiQubitTransform = new ComplexMatrix(stateSize, stateSize);
@@ -158,15 +160,15 @@ namespace QuantumShell
 
             for (int stateColumn = 0; stateColumn < stateSize; stateColumn++)
             {
-                int controlStateIndex = GetHighRegisterState(stateColumn, controlRegisterSize);
-                int targetStateIndex = GetLowRegisterState(stateColumn, controlRegisterSize);
+                int controlStateIndex = GetHighRegisterState(stateColumn, targetRegisterSize);
+                int targetStateIndex = GetLowRegisterState(stateColumn, targetRegisterSize);
 
                 int processedControlParameter = f(controlStateIndex);
                 targetStateIndex = stateTransform(targetStateIndex, processedControlParameter);
-                if (targetStateIndex < 0 || targetStateIndex > (int) System.Math.Pow(2, StateQubitList.Count))
+                if (targetStateIndex < 0 || targetStateIndex >= (int) System.Math.Pow(2, targetRegisterSize))
                     throw new ArgumentException("Function processing the directed qubit returns incorrect values.");
 
-                int registerStateIndex = GetCompleteRegisterState(controlStateIndex, targetStateIndex, controlRegisterSize);
+                int registerStateIndex = GetCompleteRegisterState(controlStateIndex, targetStateIndex, targetRegisterSize);
                 directedMultiQubitTransform.Matrix[stateColumn][registerStateIndex] = amplitude;
             }
             return directedMultiQubitTransform;
@@ -179,14 +181,14 @@ namespace QuantumShell
             return completeRegisterState;
         }
 
-        private int GetHighRegisterState(int joinedStateIndex, int highRegisterSize)
+        private int GetHighRegisterState(int joinedStateIndex, int lowRegisterSize)
         {
-            return joinedStateIndex >> highRegisterSize;
+            return joinedStateIndex >> lowRegisterSize;
         }
 
-        private int GetLowRegisterState(int joinedStateIndex, int highRegisterSize)
+        private int GetLowRegisterState(int joinedStateIndex, int lowRegisterSize)
         {
-            return joinedStateIndex % (int) System.Math.Pow(2, highRegisterSize);
+            return joinedStateIndex % (int) System.Math.Pow(2, lowRegisterSize);
         }
 
         private ComplexMatrix BuildControlledQuantumOperator(QuantumGate gate, Qubit control, Qubit target)
