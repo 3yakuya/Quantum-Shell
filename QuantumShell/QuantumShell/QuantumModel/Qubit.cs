@@ -89,7 +89,7 @@ namespace QuantumShell
             SetState(newStateVector);
         }
 
-        public void TransformMultiStateDirected(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant)
+        public void TransformRegisterStateDirected(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant)
         {
             if (controlRepresentant.StateVector == this.StateVector)
                 throw new ArgumentException("Target and control registers must be separate.");
