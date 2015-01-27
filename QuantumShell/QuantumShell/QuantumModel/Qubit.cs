@@ -105,7 +105,6 @@ namespace QuantumShell
             SetState(newStateVector);
         }
 
-
         public string Peek()
         {
             string stateString = "";
