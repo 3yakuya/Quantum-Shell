@@ -11,13 +11,20 @@ namespace QuantumShell.Math
         public double Real { get; set; }
         public double Imaginary { get; set; }
 
-        public Complex(double real, double imaginary)
+        public Complex(double real, double imaginary, int precision)
         {
+            double errorCorrector = System.Math.Pow(10, -1 * precision);
             this.Real = real;
             this.Imaginary = imaginary;
+            if (System.Math.Abs(Real) < errorCorrector)
+                Real = 0;
+            if (System.Math.Abs(Imaginary) < errorCorrector)
+                Imaginary = 0;        
         }
 
-        public Complex() : this(0, 0) { }
+        public Complex(double real, double imaginary) : this(real, imaginary, 10) { }
+
+        public Complex() : this(0, 0, 10) { }
 
         public Complex(double realOnly) : this(realOnly, 0) { }
 
@@ -29,14 +36,14 @@ namespace QuantumShell.Math
             string stringRepresentation = "(";
             if (this.Real != 0)
             {
-                stringRepresentation += this.Real.ToString();
+                stringRepresentation += this.Real.ToString("0.####");
             }
 
             if (this.Imaginary != 0)
             {
                 if (this.Real != 0)
                     stringRepresentation += " + ";
-                stringRepresentation += this.Imaginary.ToString() + "i";
+                stringRepresentation += this.Imaginary.ToString("0.####") + "i";
             }
             stringRepresentation += ")";
             return stringRepresentation;
@@ -109,6 +116,11 @@ namespace QuantumShell.Math
 
         public static Complex Power(Complex number, int power)
         {
+            if (power < 0)
+                throw new ArgumentException("Only 0 or positive powers can be calulated.");
+            if (power == 0)
+                return new Complex(1);
+
             Complex result = new Complex(number.Real, number.Imaginary);
             for (int i = 1; i < power; i++)
             {
