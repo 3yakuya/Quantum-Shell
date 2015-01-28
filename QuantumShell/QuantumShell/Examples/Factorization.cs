@@ -55,11 +55,13 @@ namespace QuantumShell.Examples
         /// factorizedNumber represents the number to be factorized.
         /// a is a number that should be coprime with factorizedNumber. We are trying to find order of a mod factorizedNumber.
         /// Remember that 2^n must be greater or equal 2*r^2.
+        /// 
+        /// By default this method is used to find order of 7 (mod 25) (which is 4).
         /// </summary>
         /// <param name="x">A target index will be passed here</param>
         /// <param name="y">A control index will be passed here</param>
         /// <returns>New index for target register (in other words: how it is going to be transformed).</returns>
-        private static int FacorFunction(int x, int y)
+        private int FacorFunction(int x, int y)
         {
             int factorizedNumber = 25;
             int a = 7;
@@ -83,7 +85,7 @@ namespace QuantumShell.Examples
         /// </summary>
         /// <param name="x">Control state index.</param>
         /// <returns>Mapped state index (here - leaves it unchanged).</returns>
-        private static int MapIndex(int x)
+        private int MapIndex(int x)
         {
             return x;
         }
