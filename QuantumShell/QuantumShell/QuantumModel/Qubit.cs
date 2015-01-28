@@ -295,7 +295,10 @@ namespace QuantumShell
             for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
                 if (!BitIsSet(stateIndex, qubitIndex))
-                    probabilityOfZero += Complex.Power(StateVector.Matrix[0][stateIndex], 2).Real;
+                {
+                    double absoluteValue = Complex.Absolute(StateVector.Matrix[0][stateIndex]);
+                    probabilityOfZero += absoluteValue * absoluteValue;
+                }
             }
             return probabilityOfZero;
         }

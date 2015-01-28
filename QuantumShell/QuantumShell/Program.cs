@@ -15,37 +15,41 @@ namespace QuantumShell
     {
         static void Main(string[] args)
         {
-            Qubit[] register = new Qubit[8];
-            for (int i = 0; i < 8; i++)
+            Qubit[] register = new Qubit[10];
+            for (int i = 0; i < 10; i++)
                 register[i] = new Qubit(i);
 
             register[0].JoinState(register[1]);
             register[1].JoinState(register[2]);
             register[2].JoinState(register[3]);
+            register[3].JoinState(register[4]);
 
-            register[4].JoinState(register[5]);
             register[5].JoinState(register[6]);
             register[6].JoinState(register[7]);
+            register[7].JoinState(register[8]);
+            register[8].JoinState(register[9]);
 
-            QuantumGate QFT = new QuantumFourierTransform(4);
-            QuantumGate IQFT = new InverseQuantumFourierTransform(4);
+            QuantumGate QFT = new QuantumFourierTransform(5);
+            QuantumGate IQFT = new InverseQuantumFourierTransform(5);
 
             register[0].TransformState(new PauliXGate());
 
-            register[4].TransformState(QFT);
-            register[3].TransformRegisterStateDirected(factorFunc, retx, register[4]);
-            register[4].TransformState(IQFT);
-            Console.WriteLine(register[4].Peek());
+            register[5].TransformState(QFT);
+            register[4].TransformRegisterStateDirected(factorFunc, retx, register[5]);
+            register[5].TransformState(IQFT);
+            Console.WriteLine(register[5].Peek());
 
             double sum = 0;
             foreach (var prob in register[0].StateVector.Matrix[0])
-                sum += QuantumShell.Math.Complex.Power(prob, 2).Real;
+                sum += System.Math.Abs(QuantumShell.Math.Complex.Power(prob, 2).Real);
             Console.WriteLine("Total probability: " + sum);
 
-            Console.WriteLine(register[4].Measure());
             Console.WriteLine(register[5].Measure());
             Console.WriteLine(register[6].Measure());
             Console.WriteLine(register[7].Measure());
+            Console.WriteLine(register[8].Measure());
+            Console.WriteLine(register[9].Measure());
+
             Console.ReadLine();
 
             //Interpreter interpreter = new Interpreter();
@@ -54,12 +58,12 @@ namespace QuantumShell
 
         private static int factorFunc(int x, int y)
         {
-            if (x < 15)
+            if (x < 25)
             {
                 int result = x;
                 for (int i = 0; i < y; i++)
                 {
-                    result = (result * 11) % 15;
+                    result = (result * 7) % 25;
                 }
                 return result;
             }

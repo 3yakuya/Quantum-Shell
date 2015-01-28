@@ -100,11 +100,11 @@ namespace QuantumShell.Math
             if (two.Real == 0 && two.Imaginary == 0)
                 throw new ArgumentException();
 
-            Complex result = new Complex();
-            result.Real = (one.Real * two.Real + one.Imaginary * two.Imaginary) /
+            double real = (one.Real * two.Real + one.Imaginary * two.Imaginary) /
                 (two.Real * two.Real + two.Imaginary * two.Imaginary);
-            result.Imaginary = (one.Imaginary * two.Real - one.Real * two.Imaginary) /
+            double imaginary = (one.Imaginary * two.Real - one.Real * two.Imaginary) /
                 (two.Real * two.Real + two.Imaginary * two.Imaginary);
+            Complex result = new Complex(real, imaginary);
             return result;
         }
 
@@ -120,6 +120,13 @@ namespace QuantumShell.Math
             if (one.Real != two.Real || one.Imaginary != two.Imaginary)
                 return true;
             return false;
+        }
+
+        public static double Absolute(Complex number)
+        {
+            double x = number.Real * number.Real;
+            double y = number.Imaginary * number.Imaginary;
+            return System.Math.Sqrt(x + y);
         }
 
         public static Complex Power(Complex number, int power)
