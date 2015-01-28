@@ -22,8 +22,11 @@ namespace QuantumShell
             //HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
             //hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
 
-            DeutschJozsa deutschJozsaProblem = new DeutschJozsa();
-            deutschJozsaProblem.DeutschJozsaQuantumRoutine();
+            //DeutschJozsa deutschJozsaProblem = new DeutschJozsa();
+            //deutschJozsaProblem.DeutschJozsaQuantumRoutine();
+
+            Deutsch deutschProblem = new Deutsch();
+            deutschProblem.DeutschQuantumRoutine();
 
             //Interpreter interpreter = new Interpreter();
             //interpreter.Run();

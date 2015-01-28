@@ -8,20 +8,19 @@ using System.Threading.Tasks;
 namespace QuantumShell.Examples
 {
     /// <summary>
-    /// This class provides methods to show the possible usage of the Quantum Shell for the Deutsch - Jozsa problem.
-    /// The code demonstrates the quantum Deutsch - Jozsa Algorithm.
+    /// This class provides methods to show the possible usage of the Quantum Shell for the Deutsch problem.
+    /// The code demonstrates the quantum Deutsch Algorithm.
     /// 
     /// The functions that we check are coded in ConstantFunction and BalancedFunction methods.
-    /// WARNING: setting the registerSize to be greater than 10 will cause some methods to take a long time.
     /// 
     /// The measured results informs us if the checked function is constant or balanced. In the first case
     /// the measured value will always be 0. Otherwise it will never be 0 (at least a single 1 in the measured register will occur).
     /// </summary>
-    class DeutschJozsa
+    class Deutsch
     {
-        public void DeutschJozsaQuantumRoutine()
+        public void DeutschQuantumRoutine()
         {
-            int registerSize = 8;
+            int registerSize = 2;
 
             Qubit[] register = InitializeQuantumRegister(registerSize);
             PrepareLowRegister(register);
@@ -51,23 +50,14 @@ namespace QuantumShell.Examples
         private void QuantumSubroutine(Qubit[] register, QuantumGate H, Func<int, int> function)
         {
             Console.WriteLine("\nPerforming the quantum routine...\n");
-            int registerSize = register.Length;
 
-            for (int i = 1; i < register.Length; i++)
-            {
-                register[i].TransformState(H);
-            }
-
+            register[1].TransformState(H);
             register[0].TransformRegisterStateDirected(Xor, function, register[1]);
-
-            for (int i = 1; i < register.Length; i++)
-            {
-                register[i].TransformState(H);
-            }
+            register[1].TransformState(H);
         }
 
         /// <summary>
-        ///This method is used with TransformRegisterStateDirected to build the transformation matrix for Deutsch-Jozsa
+        ///This method is used with TransformRegisterStateDirected to build the transformation matrix for Deutsch
         ///quantum routine.
         /// </summary>
         /// <param name="x">A target index will be passed here</param>
@@ -92,7 +82,7 @@ namespace QuantumShell.Examples
 
         /// <summary>
         /// This is the function for TransformRegisterStateDirected. It is used to map control index state to other states.
-        /// It is a constant function. It transforms {0,1}^(n-1) -> {0,1}, where n is the size of the quantum register.
+        /// It is a constant function.
         /// 
         /// </summary>
         /// <param name="x">Control state index.</param>
@@ -131,10 +121,7 @@ namespace QuantumShell.Examples
 
         private void PrepareHighRegister(Qubit[] register)
         {
-            for (int i = 2; i < register.Length; i++)
-            {
-                register[i].JoinState(register[i - 1]);
-            }
+            
         }
 
         private void PeekRegister(Qubit[] register)
@@ -148,12 +135,7 @@ namespace QuantumShell.Examples
         private void MeasureHighRegister(Qubit[] register)
         {
             Console.WriteLine("\nMeasured result:");
-
-            int highRegisterStart = register.Length / 2;
-            for (int i = register.Length - 1; i >= 1; i--)
-            {
-                Console.Write(register[i].Measure());
-            }
+            Console.Write(register[1].Measure());
             Console.WriteLine();
         }
 
