@@ -284,7 +284,8 @@ namespace QuantumShell
 
         private bool BitIsSet(int number, int bit)
         {
-            return (number & (1 << bit)) != 0;
+            bool val = (number & (1 << bit)) != 0;
+            return val;
         }
 
         private double GetProbabilityOfMeasuringZero()

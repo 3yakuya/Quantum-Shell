@@ -5,6 +5,7 @@ using QuantumShell.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,40 +21,55 @@ namespace QuantumShell
 
             register[0].JoinState(register[1]);
             register[1].JoinState(register[2]);
-            //register[2].JoinState(register[3]);
+            register[2].JoinState(register[3]);
 
-            QuantumGate QFT = new QuantumFourierTransform(3);
-            QuantumGate IQFT = new InverseQuantumFourierTransform(3);
+            register[4].JoinState(register[5]);
+            register[5].JoinState(register[6]);
+            register[6].JoinState(register[7]);
 
-            foreach (var row in QFT.Transform.Matrix)
-            {
-                foreach (var element in row)
-                {
-                    Console.Write("{0:0.00}\t", element);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-            foreach (var row in IQFT.Transform.Matrix)
-            {
-                foreach (var element in row)
-                {
-                    Console.Write("{0:N3}\t", element);
-                }
-                Console.WriteLine();
-            }
+            QuantumGate QFT = new QuantumFourierTransform(4);
+            QuantumGate IQFT = new InverseQuantumFourierTransform(4);
 
-            Console.WriteLine();
-            register[0].TransformState(QFT);
-            Console.WriteLine(register[0].Peek());
-            Console.WriteLine();
-            register[0].TransformState(IQFT);
-            Console.WriteLine(register[0].Peek());
+            register[0].TransformState(new PauliXGate());
 
+            register[4].TransformState(QFT);
+            register[3].TransformRegisterStateDirected(factorFunc, retx, register[4]);
+            register[4].TransformState(IQFT);
+            Console.WriteLine(register[4].Peek());
+
+            double sum = 0;
+            foreach (var prob in register[0].StateVector.Matrix[0])
+                sum += QuantumShell.Math.Complex.Power(prob, 2).Real;
+            Console.WriteLine("Total probability: " + sum);
+
+            Console.WriteLine(register[4].Measure());
+            Console.WriteLine(register[5].Measure());
+            Console.WriteLine(register[6].Measure());
+            Console.WriteLine(register[7].Measure());
             Console.ReadLine();
 
             //Interpreter interpreter = new Interpreter();
             //interpreter.Run();
+        }
+
+        private static int factorFunc(int x, int y)
+        {
+            if (x < 15)
+            {
+                int result = x;
+                for (int i = 0; i < y; i++)
+                {
+                    result = (result * 11) % 15;
+                }
+                return result;
+            }
+            else
+                return x;
+        }
+
+        private static int retx(int x)
+        {
+            return x;
         }
 
         private static int Xor(int x, int y)

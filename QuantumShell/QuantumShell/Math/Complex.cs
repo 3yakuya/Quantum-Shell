@@ -11,6 +11,14 @@ namespace QuantumShell.Math
         public double Real { get; set; }
         public double Imaginary { get; set; }
 
+        private static int DefaultPrecision
+        {
+            get
+            {
+                return 10;
+            }
+        }
+
         public Complex(double real, double imaginary, int precision)
         {
             double errorCorrector = System.Math.Pow(10, -1 * precision);
@@ -22,11 +30,11 @@ namespace QuantumShell.Math
                 Imaginary = 0;        
         }
 
-        public Complex(double real, double imaginary) : this(real, imaginary, 10) { }
+        public Complex(double real, double imaginary) : this(real, imaginary, DefaultPrecision) { }
 
-        public Complex() : this(0, 0, 10) { }
+        public Complex() : this(0, 0, DefaultPrecision) { }
 
-        public Complex(double realOnly) : this(realOnly, 0) { }
+        public Complex(double realOnly) : this(realOnly, 0, DefaultPrecision) { }
 
         public override string ToString()
         {
