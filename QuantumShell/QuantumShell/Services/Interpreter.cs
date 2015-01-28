@@ -1,4 +1,5 @@
-﻿using QuantumShell.Math;
+﻿using QuantumShell.Examples;
+using QuantumShell.Math;
 using QuantumShell.QuantumGates;
 using QuantumShell.QuantumGates.RotationGates;
 using System;
@@ -31,7 +32,7 @@ namespace QuantumShell.Services
         {
             ResetRegister();
 
-                H = new HadamardGate();
+            H = new HadamardGate();
             X = new PauliXGate();
             I = new PauliIGate();
             Y = new PauliYGate();
@@ -260,6 +261,9 @@ namespace QuantumShell.Services
                 {
                     switch (command)
                     {
+                        case "Examples":
+                            ExampleMenu();
+                            break;
                         case "Reset":
                             ResetRegister();
                             break;
@@ -294,6 +298,53 @@ namespace QuantumShell.Services
             }
         }
 
+        private void ExampleMenu()
+        {
+            bool exampleMenu = true;
+            while (exampleMenu)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Available examples:");
+                Console.WriteLine("\t->Deutsch");
+                Console.WriteLine("\t->Deutsch-Jozsa");
+                Console.WriteLine("\t->Factorization");
+                Console.WriteLine("\t->HiddenSubgroup");
+                Console.WriteLine("\nType name of example or \"exit\" to quit example menu.");
+
+                string command = Console.ReadLine();
+                switch (command)
+                {
+                    case "exit":
+                        exampleMenu = false;
+                        break;
+
+                    case "Deutsch":
+                        Deutsch deutschProblem = new Deutsch();
+                        deutschProblem.DeutschQuantumRoutine();
+                        break;
+
+                    case "Deutsch-Jozsa":
+                        DeutschJozsa deutschJozsaProblem = new DeutschJozsa();
+                        deutschJozsaProblem.DeutschJozsaQuantumRoutine();
+                        break;
+
+                    case "Factorization":
+                        Factorization factorizationProblem = new Factorization();
+                        factorizationProblem.OrderFindingQuantumSubroutine();
+                        break;
+
+                    case "HiddenSubgroup":
+                        HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
+                        hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
+                        break;
+
+                    default:
+                        Console.WriteLine("Unavailable command.");
+                        break;
+                } 
+            }
+        }
+
         private void ShowHelp()
         {
             Console.WriteLine("Available commands:");
@@ -311,6 +362,7 @@ namespace QuantumShell.Services
             Console.WriteLine("\t->Measure(qubitNumber)");
             Console.WriteLine("\t->Join(fromQubit-toQubit)");
             Console.WriteLine("\t->Reset(qubitNumber)");
+            Console.WriteLine("\t->Examples");
             Console.WriteLine("\t->Reset");
             Console.WriteLine("\t->exit");
             Console.WriteLine("\t->help");
