@@ -248,11 +248,6 @@ namespace QuantumShell.Services
                 else if (ControlledRegex.IsMatch(command))
                 {
                     string operation = command.Split('-')[1].ElementAt(0).ToString();
-                    string secondOperationChar = command.Split('-')[1].ElementAt(1).ToString();
-                    if (secondOperationChar != "(")
-                    {
-                        operation += secondOperationChar;
-                    }
                     int target = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     int control = int.Parse(command.Split('(')[1].ElementAt(2).ToString());
                     ControlledOperation(control, target, operation.ToString());
@@ -456,18 +451,6 @@ namespace QuantumShell.Services
 
                     case "T":
                         QuantumRegister[targetQubit].TransformStateControlled(T, QuantumRegister[controlQubit]);
-                        break;
-
-                    case "R2":
-                        QuantumRegister[targetQubit].TransformStateControlled(R2, QuantumRegister[controlQubit]);
-                        break;
-
-                    case "R3":
-                        QuantumRegister[targetQubit].TransformStateControlled(R3, QuantumRegister[controlQubit]);
-                        break;
-
-                    case "R4":
-                        QuantumRegister[targetQubit].TransformStateControlled(R4, QuantumRegister[controlQubit]);
                         break;
 
                     default:
