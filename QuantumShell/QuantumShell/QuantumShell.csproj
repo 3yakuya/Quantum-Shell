@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Examples\DeutschJozsa.cs" />
     <Compile Include="Examples\Factorization.cs" />
     <Compile Include="Examples\HiddenSubgroup.cs" />
     <Compile Include="QuantumGates\HadamardGate.cs" />

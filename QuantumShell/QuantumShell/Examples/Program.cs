@@ -19,8 +19,11 @@ namespace QuantumShell
             //Factorization factorizationProblem = new Factorization();
             //factorizationProblem.OrderFindingQuantumSubroutine();
 
-            HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
-            hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
+            //HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
+            //hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
+
+            DeutschJozsa deutschJozsaProblem = new DeutschJozsa();
+            deutschJozsaProblem.DeutschJozsaQuantumRoutine();
 
             //Interpreter interpreter = new Interpreter();
             //interpreter.Run();

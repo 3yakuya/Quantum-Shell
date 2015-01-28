@@ -9,8 +9,8 @@ namespace QuantumShell.Examples
 {
     /// <summary>
     /// This class provides methods to show the possible usage of the Quantum Shell for the factorization problem.
-    /// The code demostrates the quantum subroutine for Order Finding problem (one to which the Integer Factorization problem
-    /// can be reduced).
+    /// The code demostrates the quantum subroutine for Shor's Algorithm solving Order Finding problem
+    /// (one to which the Integer Factorization problem can be reduced).
     /// 
     /// Integer to be factorized and necessary a parameter are in FactorFunction method.
     /// WARNING: setting the registerSize to be greater than 10 will cause some methods to take a long time.
@@ -92,7 +92,12 @@ namespace QuantumShell.Examples
 
         private Qubit[] InitializeQuantumRegister(int size)
         {
-            if (size % 2 != 0)
+            if (size <= 0)
+            {
+                size = 2;
+                Console.WriteLine("Warning: register size must be a positive even integer. It will be set to 2.");
+            }
+            else if (size % 2 != 0)
             {
                 size -= 1;
                 Console.WriteLine("Warning: register should be even sized. It will be resized down by one.");
@@ -141,6 +146,7 @@ namespace QuantumShell.Examples
             {
                 Console.Write(register[i].Measure());   
             }
+            Console.WriteLine();
         }
     }
 }

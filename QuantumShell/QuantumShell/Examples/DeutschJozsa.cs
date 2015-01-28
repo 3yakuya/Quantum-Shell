@@ -1,5 +1,4 @@
-﻿using QuantumShell.Math;
-using QuantumShell.QuantumGates;
+﻿using QuantumShell.QuantumGates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +8,18 @@ using System.Threading.Tasks;
 namespace QuantumShell.Examples
 {
     /// <summary>
-    /// This class provides methods to show the possible usage of the Quantum Shell for the hidden subgroup problem.
-    /// It demonstrates usage of quantum subroutine of Simon's Algorithm.
+    /// This class provides methods to show the possible usage of the Quantum Shell for the Deutsch - Jozsa problem.
+    /// The code demonstrates the quantum Deutsch - Jozsa Algorithm.
     /// 
-    /// The function that we want to find the hidden string s for is defined in Function.
+    /// The functions that we check are coded in ConstantFunction and BalancedFunction methods.
     /// WARNING: setting the registerSize to be greater than 10 will cause some methods to take a long time.
     /// 
-    /// The measured result represents a random number z such that zs = 0 (so for every index i
-    /// z[i]*s[i] = 0 (mod 2)). To determine s we need to build a linear equation set of size n (where 2n
-    /// is the size of the register).
+    /// The measured results informs us if the checked function is constant or balanced. In the first case
+    /// the measured value will always be 0. Otherwise it will never be 0 (at least a single 1 in the measured register will occur).
     /// </summary>
-    class HiddenSubgroup
+    class DeutschJozsa
     {
-        public void HiddenSubgroupQuantumSubroutine() 
+        public void DeutschJozsaQuantumRoutine()
         {
             int registerSize = 8;
 
@@ -31,8 +29,18 @@ namespace QuantumShell.Examples
 
             HadamardGate H = new HadamardGate();
 
+            Console.WriteLine("|-------->Checking if ConstantFunction is balanced or constant...<--------|");
             PeekRegister(register);
-            QuantumSubroutine(register, H);
+            QuantumSubroutine(register, H, ConstantFunction);
+            PeekRegister(register);
+
+            MeasureHighRegister(register);
+            Console.WriteLine();
+
+            register = ResetQuantumRegister(register);
+            Console.WriteLine("|-------->Checking if BalancedFunction is balanced or constant...<--------|");
+            PeekRegister(register);
+            QuantumSubroutine(register, H, BalancedFunction);
             PeekRegister(register);
 
             MeasureHighRegister(register);
@@ -40,27 +48,27 @@ namespace QuantumShell.Examples
             Console.ReadLine();
         }
 
-        private void QuantumSubroutine(Qubit[] register, QuantumGate H)
+        private void QuantumSubroutine(Qubit[] register, QuantumGate H, Func<int, int> function)
         {
-            Console.WriteLine("\nPerforming the quantum subroutine...\n");
+            Console.WriteLine("\nPerforming the quantum routine...\n");
             int registerSize = register.Length;
 
-            for (int i = register.Length / 2; i < register.Length; i++)
+            for (int i = 1; i < register.Length; i++)
             {
                 register[i].TransformState(H);
             }
 
-            register[registerSize / 2 - 1].TransformRegisterStateDirected(Xor, Function, register[registerSize / 2]);
+            register[0].TransformRegisterStateDirected(Xor, function, register[1]);
 
-            for (int i = register.Length / 2; i < register.Length; i++)
+            for (int i = 1; i < register.Length; i++)
             {
                 register[i].TransformState(H);
             }
         }
 
         /// <summary>
-        ///This method is used with TransformRegisterStateDirected to build the transformation matrix for Hidden Subgroup
-        ///quantum subroutine.
+        ///This method is used with TransformRegisterStateDirected to build the transformation matrix for Deutsch-Jozsa
+        ///quantum routine.
         /// </summary>
         /// <param name="x">A target index will be passed here</param>
         /// <param name="y">A control index will be passed here</param>
@@ -72,50 +80,26 @@ namespace QuantumShell.Examples
 
         /// <summary>
         /// This is the function for TransformRegisterStateDirected. It is used to map control index state to other states.
-        /// It fulfills the following: f(x) = f(y) => x = y OR x = y XOR s, where s is the hidden string.
+        /// It is a constant function.
         /// 
-        /// By default this method's hidden string s = 1010 (binary).
         /// </summary>
         /// <param name="x">Control state index.</param>
-        /// <returns>Mapped state index.</returns>
-        private int Function(int x)
+        /// <returns>A constant mapping for any x (0 or 1).</returns>
+        private int ConstantFunction(int x)
         {
-            switch (x)
-            {
-                case 0:
-                    return 14;
-                case 1:
-                    return 9;
-                case 2:
-                    return 8;
-                case 3:
-                    return 2;
-                case 4:
-                    return 12;
-                case 5:
-                    return 0;
-                case 6:
-                    return 3;
-                case 7:
-                    return 6;
-                case 8:
-                    return 8;
-                case 9:
-                    return 2;
-                case 10:
-                    return 14;
-                case 11:
-                    return 9;
-                case 12:
-                    return 3;
-                case 13:
-                    return 6;
-                case 14:
-                    return 12;
-                case 15:
-                    return 0;
-            }
             return 0;
+        }
+
+        /// <summary>
+        /// This is the function for TransformRegisterStateDirected. It is used to map control index state to other states.
+        /// It is a constant function.
+        /// 
+        /// </summary>
+        /// <param name="x">Control state index.</param>
+        /// <returns>A balanced mapping for x (0 for half domain and 1 for the other half).</returns>
+        private int BalancedFunction(int x)
+        {
+            return x % 2;
         }
 
         private Qubit[] InitializeQuantumRegister(int size)
@@ -141,15 +125,13 @@ namespace QuantumShell.Examples
 
         private void PrepareLowRegister(Qubit[] register)
         {
-            for (int i = 1; i < register.Length / 2; i++)
-            {
-                register[i].JoinState(register[i - 1]);
-            }
+            register[0].TransformState(new PauliXGate());
+            register[0].TransformState(new HadamardGate());
         }
 
         private void PrepareHighRegister(Qubit[] register)
         {
-            for (int i = register.Length / 2 + 1; i < register.Length; i++)
+            for (int i = 2; i < register.Length; i++)
             {
                 register[i].JoinState(register[i - 1]);
             }
@@ -158,9 +140,9 @@ namespace QuantumShell.Examples
         private void PeekRegister(Qubit[] register)
         {
             Console.WriteLine("Target register state: ");
-            Console.WriteLine(register[register.Length / 2 - 1].Peek());
+            Console.WriteLine(register[0].Peek());
             Console.WriteLine("Control register state: ");
-            Console.WriteLine(register[register.Length / 2].Peek());
+            Console.WriteLine(register[1].Peek());
         }
 
         private void MeasureHighRegister(Qubit[] register)
@@ -168,11 +150,19 @@ namespace QuantumShell.Examples
             Console.WriteLine("\nMeasured result:");
 
             int highRegisterStart = register.Length / 2;
-            for (int i = register.Length - 1; i >= highRegisterStart; i--)
+            for (int i = register.Length - 1; i >= 1; i--)
             {
                 Console.Write(register[i].Measure());
             }
             Console.WriteLine();
+        }
+
+        private Qubit[] ResetQuantumRegister(Qubit[] register)
+        {
+            register = InitializeQuantumRegister(register.Length);
+            PrepareLowRegister(register);
+            PrepareHighRegister(register);
+            return register;
         }
     }
 }
