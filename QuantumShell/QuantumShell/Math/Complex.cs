@@ -11,15 +11,30 @@ namespace QuantumShell.Math
         public double Real { get; set; }
         public double Imaginary { get; set; }
 
-        public Complex(double real, double imaginary)
+        private static int DefaultPrecision
         {
-            this.Real = real;
-            this.Imaginary = imaginary;
+            get
+            {
+                return 10;
+            }
         }
 
-        public Complex() : this(0, 0) { }
+        public Complex(double real, double imaginary, int precision)
+        {
+            double errorCorrector = System.Math.Pow(10, -1 * precision);
+            this.Real = real;
+            this.Imaginary = imaginary;
+            if (System.Math.Abs(Real) < errorCorrector)
+                Real = 0;
+            if (System.Math.Abs(Imaginary) < errorCorrector)
+                Imaginary = 0;        
+        }
 
-        public Complex(double realOnly) : this(realOnly, 0) { }
+        public Complex(double real, double imaginary) : this(real, imaginary, DefaultPrecision) { }
+
+        public Complex() : this(0, 0, DefaultPrecision) { }
+
+        public Complex(double realOnly) : this(realOnly, 0, DefaultPrecision) { }
 
         public override string ToString()
         {
@@ -29,14 +44,14 @@ namespace QuantumShell.Math
             string stringRepresentation = "(";
             if (this.Real != 0)
             {
-                stringRepresentation += this.Real.ToString();
+                stringRepresentation += this.Real.ToString("0.####");
             }
 
             if (this.Imaginary != 0)
             {
                 if (this.Real != 0)
                     stringRepresentation += " + ";
-                stringRepresentation += this.Imaginary.ToString() + "i";
+                stringRepresentation += this.Imaginary.ToString("0.####") + "i";
             }
             stringRepresentation += ")";
             return stringRepresentation;
@@ -85,11 +100,11 @@ namespace QuantumShell.Math
             if (two.Real == 0 && two.Imaginary == 0)
                 throw new ArgumentException();
 
-            Complex result = new Complex();
-            result.Real = (one.Real * two.Real + one.Imaginary * two.Imaginary) /
+            double real = (one.Real * two.Real + one.Imaginary * two.Imaginary) /
                 (two.Real * two.Real + two.Imaginary * two.Imaginary);
-            result.Imaginary = (one.Imaginary * two.Real - one.Real * two.Imaginary) /
+            double imaginary = (one.Imaginary * two.Real - one.Real * two.Imaginary) /
                 (two.Real * two.Real + two.Imaginary * two.Imaginary);
+            Complex result = new Complex(real, imaginary);
             return result;
         }
 
@@ -107,8 +122,20 @@ namespace QuantumShell.Math
             return false;
         }
 
+        public static double Absolute(Complex number)
+        {
+            double x = number.Real * number.Real;
+            double y = number.Imaginary * number.Imaginary;
+            return System.Math.Sqrt(x + y);
+        }
+
         public static Complex Power(Complex number, int power)
         {
+            if (power < 0)
+                throw new ArgumentException("Only 0 or positive powers can be calulated.");
+            if (power == 0)
+                return new Complex(1);
+
             Complex result = new Complex(number.Real, number.Imaginary);
             for (int i = 1; i < power; i++)
             {

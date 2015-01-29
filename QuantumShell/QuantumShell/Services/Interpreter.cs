@@ -1,4 +1,5 @@
-﻿using QuantumShell.Math;
+﻿using QuantumShell.Examples;
+using QuantumShell.Math;
 using QuantumShell.QuantumGates;
 using QuantumShell.QuantumGates.RotationGates;
 using System;
@@ -24,14 +25,14 @@ namespace QuantumShell.Services
         private R2ReversedGate R2 { get; set; }
         private R3ReversedGate R3 { get; set; }
         private R4ReversedGate R4 { get; set; }
-
-        int qubitReverseIndex = 7;
+        private QuantumFourierTransform QFT { get; set; }
+        private InverseQuantumFourierTransform IQFT { get; set; }
 
         public Interpreter()
         {
             ResetRegister();
 
-                H = new HadamardGate();
+            H = new HadamardGate();
             X = new PauliXGate();
             I = new PauliIGate();
             Y = new PauliYGate();
@@ -40,6 +41,8 @@ namespace QuantumShell.Services
             R2 = new R2ReversedGate();
             R3 = new R3ReversedGate();
             R4 = new R4ReversedGate();
+            QFT = new QuantumFourierTransform(4);
+            IQFT = new InverseQuantumFourierTransform(4);
         }
 
         public void Run()
@@ -63,6 +66,8 @@ namespace QuantumShell.Services
             string SetPattern = @"Set\(\d,\d\)";
             string ResetPattern = @"Reset\(\d\)";
             string ControlledPattern = @"c-[H|X|Y|Z|T|R2|R3|R4]\(\d,\d\)";
+            string QFTPattern = @"QFT\(\d\)";
+            string IQFTPattern = @"IQFT\(\d\)";
 
             Regex HRegex = new Regex(HPattern);
             Regex XRegex = new Regex(XPattern);
@@ -79,6 +84,8 @@ namespace QuantumShell.Services
             Regex SetRegex = new Regex(SetPattern);
             Regex ResetRegex = new Regex(ResetPattern);
             Regex ControlledRegex = new Regex(ControlledPattern);
+            Regex QFTRegex = new Regex(QFTPattern);
+            Regex IQFTRegex = new Regex(IQFTPattern);
 
             StreamReader reader = null;
 
@@ -110,11 +117,35 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(H);
+                        QuantumRegister[qubitNumber].TransformState(H);
                     }
                     catch (Exception)
                     {
                         Console.WriteLine("An unexpected error ocurred.");
+                    }
+                }
+                else if (QFTRegex.IsMatch(command))
+                {
+                    int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
+                    try
+                    {
+                        QuantumRegister[qubitNumber].TransformState(QFT);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("An unexpected error ocurred. Note that QFT should be launched at the lowest qubit in state.");
+                    }
+                }
+                else if (IQFTRegex.IsMatch(command))
+                {
+                    int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
+                    try
+                    {
+                        QuantumRegister[qubitNumber].TransformState(QFT);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("An unexpected error ocurred. Note that IQFT should be launched at the lowest qubit in state.");
                     }
                 }
                 else if (XRegex.IsMatch(command))
@@ -122,7 +153,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(X);
+                        QuantumRegister[qubitNumber].TransformState(X);
                     }
                     catch (Exception)
                     {
@@ -134,7 +165,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(I);
+                        QuantumRegister[qubitNumber].TransformState(I);
                     }
                     catch (Exception)
                     {
@@ -146,7 +177,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(Y);
+                        QuantumRegister[qubitNumber].TransformState(Y);
                     }
                     catch (Exception)
                     {
@@ -158,7 +189,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(Z);
+                        QuantumRegister[qubitNumber].TransformState(Z);
                     }
                     catch (Exception)
                     {
@@ -170,7 +201,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(T);
+                        QuantumRegister[qubitNumber].TransformState(T);
                     }
                     catch (Exception)
                     {
@@ -182,7 +213,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(R2);
+                        QuantumRegister[qubitNumber].TransformState(R2);
                     }
                     catch (Exception)
                     {
@@ -194,7 +225,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(R3);
+                        QuantumRegister[qubitNumber].TransformState(R3);
                     }
                     catch (Exception)
                     {
@@ -206,7 +237,7 @@ namespace QuantumShell.Services
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     try
                     {
-                        QuantumRegister[qubitReverseIndex - qubitNumber].TransformState(R4);
+                        QuantumRegister[qubitNumber].TransformState(R4);
 
                     }
                     catch (Exception)
@@ -218,13 +249,13 @@ namespace QuantumShell.Services
                 {
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     Console.WriteLine("Revealing " + qubitNumber + " qubit:");
-                    Console.WriteLine(QuantumRegister[qubitReverseIndex - qubitNumber].Peek() + "\n");
+                    Console.WriteLine(QuantumRegister[ qubitNumber].Peek() + "\n");
                 }
                 else if (MeasureRegex.IsMatch(command))
                 {
                     int qubitNumber = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     Console.WriteLine("Measuring " + qubitNumber + " qubit:");
-                    Console.WriteLine(QuantumRegister[qubitReverseIndex - qubitNumber].Measure() + "\n");
+                    Console.WriteLine(QuantumRegister[qubitNumber].Measure() + "\n");
                 }
                 else if (JoinRegex.IsMatch(command))
                 {
@@ -242,16 +273,11 @@ namespace QuantumShell.Services
                 {
                     int qubit = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     Console.WriteLine("\nThis will reset all qubits in consistent state with the selected one.\n");
-                    QuantumRegister[qubitReverseIndex - qubit].ResetState();
+                    QuantumRegister[qubit].ResetState();
                 }
                 else if (ControlledRegex.IsMatch(command))
                 {
                     string operation = command.Split('-')[1].ElementAt(0).ToString();
-                    string secondOperationChar = command.Split('-')[1].ElementAt(1).ToString();
-                    if (secondOperationChar != "(")
-                    {
-                        operation += secondOperationChar;
-                    }
                     int target = int.Parse(command.Split('(')[1].ElementAt(0).ToString());
                     int control = int.Parse(command.Split('(')[1].ElementAt(2).ToString());
                     ControlledOperation(control, target, operation.ToString());
@@ -260,6 +286,9 @@ namespace QuantumShell.Services
                 {
                     switch (command)
                     {
+                        case "Examples":
+                            ExampleMenu();
+                            break;
                         case "Reset":
                             ResetRegister();
                             break;
@@ -294,10 +323,60 @@ namespace QuantumShell.Services
             }
         }
 
+        private void ExampleMenu()
+        {
+            bool exampleMenu = true;
+            while (exampleMenu)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Available examples:");
+                Console.WriteLine("\t->Deutsch");
+                Console.WriteLine("\t->Deutsch-Jozsa");
+                Console.WriteLine("\t->Factorization");
+                Console.WriteLine("\t->HiddenSubgroup");
+                Console.WriteLine("\nType name of example or \"exit\" to quit example menu.");
+                Console.Write("-> ");
+
+                string command = Console.ReadLine();
+                switch (command)
+                {
+                    case "exit":
+                        exampleMenu = false;
+                        break;
+
+                    case "Deutsch":
+                        Deutsch deutschProblem = new Deutsch();
+                        deutschProblem.DeutschQuantumRoutine();
+                        break;
+
+                    case "Deutsch-Jozsa":
+                        DeutschJozsa deutschJozsaProblem = new DeutschJozsa();
+                        deutschJozsaProblem.DeutschJozsaQuantumRoutine();
+                        break;
+
+                    case "Factorization":
+                        Factorization factorizationProblem = new Factorization();
+                        factorizationProblem.OrderFindingQuantumSubroutine();
+                        break;
+
+                    case "HiddenSubgroup":
+                        HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
+                        hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
+                        break;
+
+                    default:
+                        Console.WriteLine("Unavailable command.");
+                        break;
+                } 
+            }
+        }
+
         private void ShowHelp()
         {
             Console.WriteLine("Available commands:");
             Console.WriteLine("\t->H(qubitNumber)");
+            Console.WriteLine("\t->QFT(firstQubitOfRegister) (this is a 4-qubit QFT)");
+            Console.WriteLine("\t->IQFT(firstQubitOfRegister) (this is a 4-qubit IQFT)");
             Console.WriteLine("\t->X(qubitNumber)");
             Console.WriteLine("\t->I(qubitNumber)");
             Console.WriteLine("\t->Y(qubitNumber)");
@@ -306,11 +385,12 @@ namespace QuantumShell.Services
             Console.WriteLine("\t->R2(qubitNumber)");
             Console.WriteLine("\t->R3(qubitNumber)");
             Console.WriteLine("\t->R4(qubitNumber)");
-            Console.WriteLine("\t->c-G(control,target) (G can be any gate from above).");
+            Console.WriteLine("\t->c-G(control,target) (G can be any gate from above)");
             Console.WriteLine("\t->Peek(qubitNumber)");
             Console.WriteLine("\t->Measure(qubitNumber)");
             Console.WriteLine("\t->Join(fromQubit-toQubit)");
             Console.WriteLine("\t->Reset(qubitNumber)");
+            Console.WriteLine("\t->Examples");
             Console.WriteLine("\t->Reset");
             Console.WriteLine("\t->exit");
             Console.WriteLine("\t->help");
@@ -322,7 +402,7 @@ namespace QuantumShell.Services
             Console.WriteLine("\nResetting the quantum register...\n");
             QuantumRegister = new Qubit[8];
             for (int i = 0; i < 8; i++)
-                QuantumRegister[i] = new Qubit(7 - i);
+                QuantumRegister[i] = new Qubit(i);
         }
 
         private void JoinQubitsInRegister(int from, int to)
@@ -335,13 +415,13 @@ namespace QuantumShell.Services
             
             if (from < to)
             {
-                for (int qubitIndex = from; qubitIndex < to; qubitIndex++)
-                    QuantumRegister[qubitReverseIndex - qubitIndex].JoinState(QuantumRegister[qubitReverseIndex - qubitIndex - 1]);
+                for (int qubitIndex = from + 1; qubitIndex <= to; qubitIndex++)
+                    QuantumRegister[qubitIndex].JoinState(QuantumRegister[qubitIndex - 1]);
             }
             else
             {
-                for (int qubitIndex = to; qubitIndex < from; qubitIndex++)
-                    QuantumRegister[qubitReverseIndex - qubitIndex].JoinState(QuantumRegister[qubitReverseIndex - qubitIndex - 1]);
+                for (int qubitIndex = to + 1; qubitIndex <= from; qubitIndex++)
+                    QuantumRegister[qubitIndex].JoinState(QuantumRegister[qubitIndex - 1]);
             }
         }
 
@@ -357,7 +437,7 @@ namespace QuantumShell.Services
                 Console.WriteLine("Qubit index not in [0, 7].");
                 return;
             }
-            if (QuantumRegister[qubitReverseIndex - qubitIndex].StateQubitList.Count > 1)
+            if (QuantumRegister[qubitIndex].StateQubitList.Count > 1)
             {
                 Console.WriteLine("Selected qubit is possibly in an entangled state (it can't be set explicitly).");
                 return;
@@ -365,7 +445,7 @@ namespace QuantumShell.Services
 
             ComplexMatrix state = new ComplexMatrix(1, 2);
             state.Matrix[0][value].Real = 1;
-            QuantumRegister[qubitReverseIndex - qubitIndex].SetState(state);
+            QuantumRegister[qubitIndex].SetState(state);
         }
 
         private void ControlledOperation(int controlQubit, int targetQubit, string operation)
@@ -376,8 +456,6 @@ namespace QuantumShell.Services
                 return;
             }
 
-            controlQubit = qubitReverseIndex - controlQubit;
-            targetQubit = qubitReverseIndex - targetQubit;
             try
             {
                 switch (operation)
@@ -404,18 +482,6 @@ namespace QuantumShell.Services
 
                     case "T":
                         QuantumRegister[targetQubit].TransformStateControlled(T, QuantumRegister[controlQubit]);
-                        break;
-
-                    case "R2":
-                        QuantumRegister[targetQubit].TransformStateControlled(R2, QuantumRegister[controlQubit]);
-                        break;
-
-                    case "R3":
-                        QuantumRegister[targetQubit].TransformStateControlled(R3, QuantumRegister[controlQubit]);
-                        break;
-
-                    case "R4":
-                        QuantumRegister[targetQubit].TransformStateControlled(R4, QuantumRegister[controlQubit]);
                         break;
 
                     default:

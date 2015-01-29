@@ -89,6 +89,22 @@ namespace QuantumShell
             SetState(newStateVector);
         }
 
+        public void TransformRegisterStateDirected(Func<int, int, int> stateTransform, Func<int, int> f, Qubit controlRepresentant)
+        {
+            if (controlRepresentant.StateVector == this.StateVector)
+                throw new ArgumentException("Target and control registers must be separate.");
+            if (controlRepresentant.QubitIndex < this.QubitIndex)
+                throw new ArgumentException("Control register must be higher than target register.");
+            if (controlRepresentant.StateQubitList.Count < this.StateQubitList.Count)
+                throw new ArgumentException("Control register must contain at least as many qubits as target register.");
+
+            int targetRegisterSize = this.StateQubitList.Count;
+            JoinState(controlRepresentant);
+            ComplexMatrix fullStateOperator = BuildDirectedTransform(stateTransform, f, targetRegisterSize);
+            ComplexMatrix newStateVector = this.StateVector.Dot(fullStateOperator);
+            SetState(newStateVector);
+        }
+
         public string Peek()
         {
             string stateString = "";
@@ -133,6 +149,45 @@ namespace QuantumShell
                 return -1;
             }
             return result;
+        }
+
+        private ComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int targetRegisterSize)
+        {
+            int stateSize = StateVector.Matrix[0].Count;
+            ComplexMatrix directedMultiQubitTransform = new ComplexMatrix(stateSize, stateSize);
+            Complex amplitude = new Complex(1);
+
+            for (int stateColumn = 0; stateColumn < stateSize; stateColumn++)
+            {
+                int controlStateIndex = GetHighRegisterState(stateColumn, targetRegisterSize);
+                int targetStateIndex = GetLowRegisterState(stateColumn, targetRegisterSize);
+
+                int processedControlParameter = f(controlStateIndex);
+                targetStateIndex = stateTransform(targetStateIndex, processedControlParameter);
+                if (targetStateIndex < 0 || targetStateIndex >= (int) System.Math.Pow(2, targetRegisterSize))
+                    throw new ArgumentException("Function processing the directed qubit returns incorrect values.");
+
+                int registerStateIndex = GetCompleteRegisterState(controlStateIndex, targetStateIndex, targetRegisterSize);
+                directedMultiQubitTransform.Matrix[stateColumn][registerStateIndex] = amplitude;
+            }
+            return directedMultiQubitTransform;
+        }
+
+        private int GetCompleteRegisterState(int highRegisterState, int lowRegisterState, int highRegisterSize)
+        {
+            int completeRegisterState = highRegisterState << highRegisterSize;
+            completeRegisterState += lowRegisterState;
+            return completeRegisterState;
+        }
+
+        private int GetHighRegisterState(int joinedStateIndex, int lowRegisterSize)
+        {
+            return joinedStateIndex >> lowRegisterSize;
+        }
+
+        private int GetLowRegisterState(int joinedStateIndex, int lowRegisterSize)
+        {
+            return joinedStateIndex % (int) System.Math.Pow(2, lowRegisterSize);
         }
 
         private ComplexMatrix BuildControlledQuantumOperator(QuantumGate gate, Qubit control, Qubit target)
@@ -229,7 +284,8 @@ namespace QuantumShell
 
         private bool BitIsSet(int number, int bit)
         {
-            return (number & (1 << bit)) != 0;
+            bool val = (number & (1 << bit)) != 0;
+            return val;
         }
 
         private double GetProbabilityOfMeasuringZero()
@@ -239,7 +295,10 @@ namespace QuantumShell
             for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
             {
                 if (!BitIsSet(stateIndex, qubitIndex))
-                    probabilityOfZero += Complex.Power(StateVector.Matrix[0][stateIndex], 2).Real;
+                {
+                    double absoluteValue = Complex.Absolute(StateVector.Matrix[0][stateIndex]);
+                    probabilityOfZero += absoluteValue * absoluteValue;
+                }
             }
             return probabilityOfZero;
         }
