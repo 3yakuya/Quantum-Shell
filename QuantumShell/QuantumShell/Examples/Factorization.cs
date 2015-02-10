@@ -63,8 +63,8 @@ namespace QuantumShell.Examples
         /// <returns>New index for target register (in other words: how it is going to be transformed).</returns>
         private int FacorFunction(int x, int y)
         {
-            int factorizedNumber = 25;
-            int a = 7;
+            int factorizedNumber = 21;
+            int a = 8;
 
             if (x < factorizedNumber)
             {
