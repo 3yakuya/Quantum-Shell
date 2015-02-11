@@ -16,6 +16,6 @@ One of the documents contains a theoretical introduction ("Wstep") while the oth
 describes the architecture and solutions used in the application ("Emulator Komputera Kwantowego".)
 
 Feel free to use it.
-I kindly ask you to include the original header in you docummentation (#QuantumShell by Jakub Pilch#)
+I kindly ask you to include the original header in your docummentation (#QuantumShell by Jakub Pilch#)
 if you decide to use my work in your research. I would also be very grateful for a message - write me
 what do you build and how did you use Quantum Shell.
