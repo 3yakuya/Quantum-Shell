@@ -12,7 +12,7 @@ your own experiments. Provided examples (available both from the interpreter and
 should help you see how it is built and how to use it.
 
 There is also some solid docummentation to find in this project (currently available in Polish.)
-One of the documents contains a theoretical introduction ("Wstep") while the other one
+One paper contains a theoretical introduction ("Wstep") while the other one
 describes the architecture and solutions used in the application ("Emulator Komputera Kwantowego".)
 
 Feel free to use it.
