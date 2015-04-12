@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuantumShell.QuantumModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace QuantumShell.Math
 {
-    class ComplexMatrix
+    class ComplexMatrix : IComplexMatrix
     {
         public int RowCount { get; private set; }
         public int ColumnCount { get; private set; }
 
-        public IList<IList<Complex>> Matrix { get; private set; }
+        public IList<IList<IComplex>> Matrix { get; private set; }
 
         public ComplexMatrix(int rows, int columns)
         {
             this.RowCount = rows;
             this.ColumnCount = columns;
-            this.Matrix = new List<IList<Complex>>(RowCount);
+            this.Matrix = new List<IList<IComplex>>(RowCount);
 
             for (int i = 0; i < this.RowCount; i++)
             {
-                List<Complex> singleRow = new List<Complex>(ColumnCount);
+                List<IComplex> singleRow = new List<IComplex>(ColumnCount);
                 for (int j = 0; j < ColumnCount; j++)
                     singleRow.Add(new Complex(0));
                 this.Matrix.Add(singleRow);
@@ -30,7 +31,7 @@ namespace QuantumShell.Math
 
         public ComplexMatrix() : this(1, 1) { }
 
-        public ComplexMatrix IdentityMatrix(int size)
+        public IComplexMatrix IdentityMatrix(int size)
         {
             ComplexMatrix identityMatrix = new ComplexMatrix(size, size);
             for (int i = 0; i < size; i++)
@@ -40,22 +41,24 @@ namespace QuantumShell.Math
             return identityMatrix;
         }
 
-        public ComplexMatrix Dot(ComplexMatrix second)
+        public IComplexMatrix Dot(IComplexMatrix second)
         {
             if (this.ColumnCount != second.RowCount)
                 throw (new ArgumentException("Incorrect matrix dimensions."));
-            ComplexMatrix result = new ComplexMatrix(this.RowCount, second.ColumnCount);
+            IComplexMatrix result = new ComplexMatrix(this.RowCount, second.ColumnCount);
 
             for (int columnInSecond = 0; columnInSecond < second.ColumnCount; columnInSecond++)
                 for (int currentRow = 0; currentRow < this.RowCount; currentRow ++)
                     for (int currentColumn = 0; currentColumn < this.ColumnCount; currentColumn++)
                     {
-                        result.Matrix[currentRow][columnInSecond] += this.Matrix[currentRow][currentColumn]*second.Matrix[currentColumn][columnInSecond];
+                        IComplex toAdd = this.Matrix[currentRow][currentColumn];
+                        toAdd.Multiply(second.Matrix[currentColumn][columnInSecond]);
+                        result.Matrix[currentRow][columnInSecond].Add(toAdd);
                     }
             return result;
         }
 
-        public ComplexMatrix Tensorize(ComplexMatrix second)
+        public IComplexMatrix Tensorize(IComplexMatrix second)
         {
             ComplexMatrix result = new ComplexMatrix(this.RowCount * second.RowCount, this.ColumnCount * second.ColumnCount);
 
@@ -66,7 +69,9 @@ namespace QuantumShell.Math
                         {
                             int row = firstRow*second.RowCount + secondRow;
                             int column = firstColumn*second.ColumnCount + secondColumn;
-                            result.Matrix[row][column] = this.Matrix[firstRow][firstColumn] * second.Matrix[secondRow][secondColumn];
+                            IComplex product = this.Matrix[firstRow][firstColumn];
+                            product.Multiply(second.Matrix[secondRow][secondColumn]);
+                            result.Matrix[row][column] = product;
                         }
             return result;
         }

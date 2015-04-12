@@ -28,8 +28,8 @@ namespace QuantumShell.Examples
             PrepareLowRegister(register);
             PrepareHighRegister(register);
 
-            QuantumGate QFT = new QuantumFourierTransform(registerSize / 2);
-            QuantumGate IQFT = new InverseQuantumFourierTransform(registerSize / 2);
+            IQuantumGate QFT = new QuantumFourierTransform(registerSize / 2);
+            IQuantumGate IQFT = new InverseQuantumFourierTransform(registerSize / 2);
 
             PeekRegister(register);
             QuantumSubroutine(register, QFT, IQFT);
@@ -40,7 +40,7 @@ namespace QuantumShell.Examples
             Console.ReadLine();
         }
 
-        private void QuantumSubroutine(Qubit[] register, QuantumGate QFT, QuantumGate IQFT)
+        private void QuantumSubroutine(Qubit[] register, IQuantumGate QFT, IQuantumGate IQFT)
         {
             Console.WriteLine("\nPerforming the quantum subroutine...\n");
             int registerSize = register.Length;

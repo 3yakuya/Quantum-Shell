@@ -40,7 +40,7 @@ namespace QuantumShell.Examples
             Console.ReadLine();
         }
 
-        private void QuantumSubroutine(Qubit[] register, QuantumGate H)
+        private void QuantumSubroutine(Qubit[] register, IQuantumGate H)
         {
             Console.WriteLine("\nPerforming the quantum subroutine...\n");
             int registerSize = register.Length;

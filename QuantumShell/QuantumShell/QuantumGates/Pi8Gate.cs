@@ -1,4 +1,5 @@
 ﻿using QuantumShell.Math;
+using QuantumShell.QuantumModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace QuantumShell.QuantumGates
 {
-    class Pi8Gate : QuantumGate
+    class Pi8Gate : IQuantumGate
     {
         public override int QubitCount { get; protected set; }
-        public override ComplexMatrix Transform { get; protected set; }
+        public override IComplexMatrix Transform { get; protected set; }
         public Pi8Gate()
         {
             this.QubitCount = 1;

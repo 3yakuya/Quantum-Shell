@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuantumShell.QuantumModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuantumShell.Math
 {
-    class Complex
+    class Complex : IComplex
     {
         public double Real { get; set; }
         public double Imaginary { get; set; }
@@ -28,6 +29,49 @@ namespace QuantumShell.Math
                 Real = 0;
             if (System.Math.Abs(Imaginary) < errorCorrector)
                 Imaginary = 0;        
+        }
+
+        public void Add(IComplex number)
+        {
+            Complex result = this + (Complex)number;
+            this.Real = result.Real;
+            this.Imaginary = result.Imaginary;
+        }
+
+        public void Substract(IComplex number)
+        {
+            Complex result = this - (Complex)number;
+            this.Real = result.Real;
+            this.Imaginary = result.Imaginary;   
+        }
+
+        public void Multiply(IComplex number)
+        {
+            Complex result = this * (Complex)number;
+            this.Real = result.Real;
+            this.Imaginary = result.Imaginary;
+        }
+
+        public void Divide(IComplex number)
+        {
+            Complex result = this / (Complex)number;
+            this.Real = result.Real;
+            this.Imaginary = result.Imaginary;
+        }
+
+        public bool EqualTo(IComplex number)
+        {
+            return this == (Complex)number;
+        }
+
+        public double Absolute()
+        {
+            return Complex.Absolute(this);
+        }
+
+        public IComplex Power(int power)
+        {
+            return Complex.Power(this, power);
         }
 
         public Complex(double real, double imaginary) : this(real, imaginary, DefaultPrecision) { }

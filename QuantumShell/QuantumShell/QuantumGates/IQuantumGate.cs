@@ -1,4 +1,5 @@
 ﻿using QuantumShell.Math;
+using QuantumShell.QuantumModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace QuantumShell
 {
-    abstract class QuantumGate
+    public abstract class IQuantumGate
     {
         public virtual int QubitCount { get; protected set; }
-        public virtual ComplexMatrix Transform { get; protected set; }
+        public virtual IComplexMatrix Transform { get; protected set; }
     }
 }
