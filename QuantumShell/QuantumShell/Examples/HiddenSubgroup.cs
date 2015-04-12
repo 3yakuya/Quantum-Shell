@@ -1,5 +1,6 @@
 ﻿using QuantumShell.Math;
 using QuantumShell.QuantumGates;
+using QuantumShell.QuantumModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace QuantumShell.Examples
         {
             int registerSize = 8;
 
-            Qubit[] register = InitializeQuantumRegister(registerSize);
+            QuantumBit[] register = InitializeQuantumRegister(registerSize);
             PrepareLowRegister(register);
             PrepareHighRegister(register);
 
@@ -40,7 +41,7 @@ namespace QuantumShell.Examples
             Console.ReadLine();
         }
 
-        private void QuantumSubroutine(Qubit[] register, IQuantumGate H)
+        private void QuantumSubroutine(QuantumBit[] register, IQuantumGate H)
         {
             Console.WriteLine("\nPerforming the quantum subroutine...\n");
             int registerSize = register.Length;
@@ -118,7 +119,7 @@ namespace QuantumShell.Examples
             return 0;
         }
 
-        private Qubit[] InitializeQuantumRegister(int size)
+        private QuantumBit[] InitializeQuantumRegister(int size)
         {
             if (size <= 0)
             {
@@ -131,7 +132,7 @@ namespace QuantumShell.Examples
                 Console.WriteLine("Warning: register should be even sized. It will be resized down by one.");
             }
 
-            Qubit[] register = new Qubit[size];
+            QuantumBit[] register = new Qubit[size];
             for (int i = 0; i < size; i++)
             {
                 register[i] = new Qubit(i);
@@ -139,7 +140,7 @@ namespace QuantumShell.Examples
             return register;
         }
 
-        private void PrepareLowRegister(Qubit[] register)
+        private void PrepareLowRegister(QuantumBit[] register)
         {
             for (int i = 1; i < register.Length / 2; i++)
             {
@@ -147,7 +148,7 @@ namespace QuantumShell.Examples
             }
         }
 
-        private void PrepareHighRegister(Qubit[] register)
+        private void PrepareHighRegister(QuantumBit[] register)
         {
             for (int i = register.Length / 2 + 1; i < register.Length; i++)
             {
@@ -155,7 +156,7 @@ namespace QuantumShell.Examples
             }
         }
 
-        private void PeekRegister(Qubit[] register)
+        private void PeekRegister(QuantumBit[] register)
         {
             Console.WriteLine("Target register state: ");
             Console.WriteLine(register[register.Length / 2 - 1].Peek());
@@ -163,7 +164,7 @@ namespace QuantumShell.Examples
             Console.WriteLine(register[register.Length / 2].Peek());
         }
 
-        private void MeasureHighRegister(Qubit[] register)
+        private void MeasureHighRegister(QuantumBit[] register)
         {
             Console.WriteLine("\nMeasured result:");
 

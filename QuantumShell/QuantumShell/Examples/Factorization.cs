@@ -1,4 +1,5 @@
 ﻿using QuantumShell.QuantumGates;
+using QuantumShell.QuantumModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace QuantumShell.Examples
         {
             int registerSize = 10;
 
-            Qubit[] register = InitializeQuantumRegister(registerSize);
+            QuantumBit[] register = InitializeQuantumRegister(registerSize);
             PrepareLowRegister(register);
             PrepareHighRegister(register);
 
@@ -40,7 +41,7 @@ namespace QuantumShell.Examples
             Console.ReadLine();
         }
 
-        private void QuantumSubroutine(Qubit[] register, IQuantumGate QFT, IQuantumGate IQFT)
+        private void QuantumSubroutine(QuantumBit[] register, IQuantumGate QFT, IQuantumGate IQFT)
         {
             Console.WriteLine("\nPerforming the quantum subroutine...\n");
             int registerSize = register.Length;
@@ -56,7 +57,7 @@ namespace QuantumShell.Examples
         /// a is a number that should be coprime with factorizedNumber. We are trying to find order of a mod factorizedNumber.
         /// Remember that 2^n must be greater or equal 2*r^2.
         /// 
-        /// By default this method is used to find order of 7 (mod 25) (which is 4).
+        /// By default this method is used to find order of 8 (mod 21) (which is 2).
         /// </summary>
         /// <param name="x">A target index will be passed here</param>
         /// <param name="y">A control index will be passed here</param>
@@ -90,7 +91,7 @@ namespace QuantumShell.Examples
             return x;
         }
 
-        private Qubit[] InitializeQuantumRegister(int size)
+        private QuantumBit[] InitializeQuantumRegister(int size)
         {
             if (size <= 0)
             {
@@ -103,7 +104,7 @@ namespace QuantumShell.Examples
                 Console.WriteLine("Warning: register should be even sized. It will be resized down by one.");
             }
 
-            Qubit[] register = new Qubit[size];
+            QuantumBit[] register = new Qubit[size];
             for (int i = 0; i < size; i++)
             {
                 register[i] = new Qubit(i);
@@ -111,7 +112,7 @@ namespace QuantumShell.Examples
             return register;
         }
 
-        private void PrepareLowRegister(Qubit[] register)
+        private void PrepareLowRegister(QuantumBit[] register)
         {
             for (int i = 1; i < register.Length / 2; i++)
             {
@@ -121,7 +122,7 @@ namespace QuantumShell.Examples
             register[0].TransformState(new PauliXGate());
         }
 
-        private void PrepareHighRegister(Qubit[] register)
+        private void PrepareHighRegister(QuantumBit[] register)
         {
             for (int i = register.Length / 2 + 1; i < register.Length; i++)
             {
@@ -129,7 +130,7 @@ namespace QuantumShell.Examples
             }
         }
 
-        private void PeekRegister(Qubit[] register)
+        private void PeekRegister(QuantumBit[] register)
         {
             Console.WriteLine("Target register state: ");
             Console.WriteLine(register[register.Length / 2 - 1].Peek());
@@ -137,7 +138,7 @@ namespace QuantumShell.Examples
             Console.WriteLine(register[register.Length / 2].Peek());
         }
 
-        private void MeasureHighRegister(Qubit[] register)
+        private void MeasureHighRegister(QuantumBit[] register)
         {
             Console.WriteLine("\nMeasured result:");
 
