@@ -2,6 +2,7 @@
 using QuantumShell.Math;
 using QuantumShell.QuantumGates;
 using QuantumShell.QuantumGates.RotationGates;
+using QuantumShell.QuantumModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +15,7 @@ namespace QuantumShell.Services
 {
     class Interpreter
     {
-        private Qubit[] QuantumRegister { get; set; }
+        private QuantumBit[] QuantumRegister { get; set; }
 
         private HadamardGate H { get; set; }
         private PauliXGate X { get; set; }

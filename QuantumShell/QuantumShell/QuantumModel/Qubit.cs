@@ -155,8 +155,8 @@ namespace QuantumShell
         private IComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int targetRegisterSize)
         {
             int stateSize = StateVector.Matrix[0].Count;
-            ComplexMatrix directedMultiQubitTransform = new ComplexMatrix(stateSize, stateSize);
-            Complex amplitude = new Complex(1);
+            IComplexMatrix directedMultiQubitTransform = new ComplexMatrix(stateSize, stateSize);
+            IComplex amplitude = new Complex(1);
 
             for (int stateColumn = 0; stateColumn < stateSize; stateColumn++)
             {
@@ -323,7 +323,7 @@ namespace QuantumShell
                 remainingProbabilitiesSum += Complex.Power(amplitude, 2).Real;
             }
 
-            Complex normalizer = new Complex(System.Math.Sqrt(remainingProbabilitiesSum));
+            IComplex normalizer = new Complex(System.Math.Sqrt(remainingProbabilitiesSum));
             for (int amplitudeIndex = 0; amplitudeIndex < StateVector.ColumnCount; amplitudeIndex++)
             {
                 StateVector.Matrix[0][amplitudeIndex].Divide(normalizer);

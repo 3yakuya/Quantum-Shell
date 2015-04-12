@@ -33,7 +33,7 @@ namespace QuantumShell.Math
 
         public IComplexMatrix IdentityMatrix(int size)
         {
-            ComplexMatrix identityMatrix = new ComplexMatrix(size, size);
+            IComplexMatrix identityMatrix = new ComplexMatrix(size, size);
             for (int i = 0; i < size; i++)
             {
                 identityMatrix.Matrix[i][i] = new Complex(1);
@@ -51,7 +51,7 @@ namespace QuantumShell.Math
                 for (int currentRow = 0; currentRow < this.RowCount; currentRow ++)
                     for (int currentColumn = 0; currentColumn < this.ColumnCount; currentColumn++)
                     {
-                        IComplex toAdd = this.Matrix[currentRow][currentColumn];
+                        IComplex toAdd = new Complex(this.Matrix[currentRow][currentColumn].Real, this.Matrix[currentRow][currentColumn].Imaginary);
                         toAdd.Multiply(second.Matrix[currentColumn][columnInSecond]);
                         result.Matrix[currentRow][columnInSecond].Add(toAdd);
                     }
@@ -60,16 +60,16 @@ namespace QuantumShell.Math
 
         public IComplexMatrix Tensorize(IComplexMatrix second)
         {
-            ComplexMatrix result = new ComplexMatrix(this.RowCount * second.RowCount, this.ColumnCount * second.ColumnCount);
+            IComplexMatrix result = new ComplexMatrix(this.RowCount * second.RowCount, this.ColumnCount * second.ColumnCount);
 
             for (int firstRow = 0; firstRow < this.RowCount; firstRow++)
                 for (int firstColumn = 0; firstColumn < this.ColumnCount; firstColumn++)
                     for (int secondRow = 0; secondRow < second.RowCount; secondRow++)
                         for (int secondColumn = 0; secondColumn < second.ColumnCount; secondColumn++)
                         {
-                            int row = firstRow*second.RowCount + secondRow;
-                            int column = firstColumn*second.ColumnCount + secondColumn;
-                            IComplex product = this.Matrix[firstRow][firstColumn];
+                            int row = firstRow * second.RowCount + secondRow;
+                            int column = firstColumn * second.ColumnCount + secondColumn;
+                            IComplex product = new Complex(this.Matrix[firstRow][firstColumn].Real, this.Matrix[firstRow][firstColumn].Imaginary);
                             product.Multiply(second.Matrix[secondRow][secondColumn]);
                             result.Matrix[row][column] = product;
                         }
