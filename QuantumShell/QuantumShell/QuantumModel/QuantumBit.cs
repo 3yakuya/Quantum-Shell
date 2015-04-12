@@ -8,6 +8,7 @@ namespace QuantumShell.QuantumModel
         IComplexMatrix StateVector { get; }
         IList<QuantumBit> StateQubitList { get; }
         int QubitIndex { get; }
+        IQuantumProvider ComplexProvider { get; }
 
         void ResetState();
         void JoinState(QuantumBit quantumBit);

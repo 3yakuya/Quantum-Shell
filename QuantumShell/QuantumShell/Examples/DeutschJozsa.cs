@@ -1,4 +1,5 @@
-﻿using QuantumShell.QuantumGates;
+﻿using QuantumShell.Math;
+using QuantumShell.QuantumGates;
 using QuantumShell.QuantumModel;
 using System;
 using System.Collections.Generic;
@@ -117,9 +118,10 @@ namespace QuantumShell.Examples
             }
 
             QuantumBit[] register = new Qubit[size];
+            IQuantumProvider provider = new ComplexProvider();
             for (int i = 0; i < size; i++)
             {
-                register[i] = new Qubit(i);
+                register[i] = new Qubit(i, provider);
             }
             return register;
         }

@@ -402,8 +402,9 @@ namespace QuantumShell.Services
         {
             Console.WriteLine("\nResetting the quantum register...\n");
             QuantumRegister = new Qubit[8];
+            IQuantumProvider provider = new ComplexProvider();
             for (int i = 0; i < 8; i++)
-                QuantumRegister[i] = new Qubit(i);
+                QuantumRegister[i] = new Qubit(i, provider);
         }
 
         private void JoinQubitsInRegister(int from, int to)

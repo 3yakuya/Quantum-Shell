@@ -11,6 +11,6 @@
         void Divide(IComplex number);
         bool EqualTo(IComplex number);
         double Absolute();
-        IComplex Power(int power);
+        void Power(int power);
     }
 }

@@ -13,9 +13,11 @@ namespace QuantumShell
         public IComplexMatrix StateVector { get; private set; }
         public IList<QuantumBit> StateQubitList { get; private set; }
         public int QubitIndex { get; private set; }
+        public IQuantumProvider ComplexProvider { get; private set; }
 
-        public Qubit(int index)
+        public Qubit(int index, IQuantumProvider complexProvider)
         {
+            this.ComplexProvider = complexProvider;
             this.QubitIndex = index;
             this.Reset();
         }
@@ -48,10 +50,10 @@ namespace QuantumShell
             if (System.Math.Abs(this.QubitIndex - qubit.QubitIndex) != 1)
                 throw new ArgumentException("Only a consistent state may be formed.");
 
-            var currentStateQubitList = new List<QuantumBit>(this.StateQubitList);
+            var currentStateQubitList = ComplexProvider.List(this.StateQubitList);
             currentStateQubitList.Add(qubit);
 
-            var qubitsToConsiderInState = new List<QuantumBit>();
+            var qubitsToConsiderInState = ComplexProvider.List();
             qubitsToConsiderInState.Add(this);
             qubitsToConsiderInState.Add(qubit);
             qubitsToConsiderInState = qubitsToConsiderInState.OrderBy(q => q.QubitIndex).ToList();
@@ -115,7 +117,7 @@ namespace QuantumShell
 
             for (int state = 0; state < numberOfStates; state++)
             {
-                if (!StateVector.Matrix[0][state].EqualTo(new Complex(0)))
+                if (!StateVector.Matrix[0][state].EqualTo(ComplexProvider.Complex(0)))
                 {
                     if (firstStatePeeked)
                         stateString += " + ";
@@ -131,7 +133,7 @@ namespace QuantumShell
         {
             double probability0 = GetProbabilityOfMeasuringZero();
 
-            Random random = new Random();
+            IRandomGenerator random = ComplexProvider.RandomGenerator();
             double randomProbability = random.NextDouble();
 
             int result;
@@ -155,8 +157,8 @@ namespace QuantumShell
         private IComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int targetRegisterSize)
         {
             int stateSize = StateVector.Matrix[0].Count;
-            IComplexMatrix directedMultiQubitTransform = new ComplexMatrix(stateSize, stateSize);
-            IComplex amplitude = new Complex(1);
+            IComplexMatrix directedMultiQubitTransform = ComplexProvider.ComplexMatrix(stateSize, stateSize);
+            IComplex amplitude = ComplexProvider.Complex(1);
 
             for (int stateColumn = 0; stateColumn < stateSize; stateColumn++)
             {
@@ -197,7 +199,7 @@ namespace QuantumShell
             int numberOfQubits = StateQubitList.Count;
             int controlBit = StateQubitList.IndexOf(control);
             int targetBit = StateQubitList.IndexOf(target);
-            IComplexMatrix controlledTransform = new ComplexMatrix().IdentityMatrix(stateSize);
+            IComplexMatrix controlledTransform = ComplexProvider.ComplexMatrix().IdentityMatrix(stateSize);
 
             for (int row = 0; row < stateSize; row++)
             {
@@ -227,9 +229,9 @@ namespace QuantumShell
 
         private IComplexMatrix BuildStateQuantumOperator(IQuantumGate gate)
         {
-            IComplexMatrix stateOperator = new ComplexMatrix();
+            IComplexMatrix stateOperator = ComplexProvider.ComplexMatrix();
             stateOperator.Matrix[0][0].Real = 1;
-            IComplexMatrix identity = new ComplexMatrix().IdentityMatrix(2);
+            IComplexMatrix identity = ComplexProvider.ComplexMatrix().IdentityMatrix(2);
 
             for (int qubitIndex = 0; qubitIndex < this.StateQubitList.Count; qubitIndex++)
             {
@@ -248,11 +250,11 @@ namespace QuantumShell
 
         private void Reset()
         {
-            this.StateVector = new ComplexMatrix(1, 2);
-            this.StateVector.Matrix[0][0] = new Complex(1);
-            this.StateVector.Matrix[0][1] = new Complex(0);
+            this.StateVector = ComplexProvider.ComplexMatrix(1, 2);
+            this.StateVector.Matrix[0][0] = ComplexProvider.Complex(1);
+            this.StateVector.Matrix[0][1] = ComplexProvider.Complex(0);
 
-            this.StateQubitList = new List<QuantumBit>();
+            this.StateQubitList = ComplexProvider.List();
             this.StateQubitList.Add(this);
             this.SetSelfStateIndex();
         }
@@ -264,8 +266,8 @@ namespace QuantumShell
 
         private IComplexMatrix GetStateVector(IList<QuantumBit> qubitsToAddToState)
         {
-            IComplexMatrix stateVector = new ComplexMatrix();
-            stateVector.Matrix[0][0] = new Complex(1);
+            IComplexMatrix stateVector = ComplexProvider.ComplexMatrix();
+            stateVector.Matrix[0][0] = ComplexProvider.Complex(1);
             foreach (QuantumBit qubit in qubitsToAddToState)
             {
                 stateVector = qubit.StateVector.Tensorize(stateVector);
@@ -275,7 +277,7 @@ namespace QuantumShell
 
         private IList<QuantumBit> GetStateQubitList(IList<QuantumBit> currentQubitStateList)
         {
-            List<QuantumBit> stateQubitList = new List<QuantumBit>(currentQubitStateList);
+            IList<QuantumBit> stateQubitList = ComplexProvider.List(currentQubitStateList);
             foreach (Qubit qubit in currentQubitStateList)
             {
                 stateQubitList = stateQubitList.Union(qubit.StateQubitList).ToList();
@@ -311,19 +313,21 @@ namespace QuantumShell
             {
                 if ((BitIsSet(stateIndex, qubitIndex) && measuredValue == 0) ||
                     (!BitIsSet(stateIndex, qubitIndex) && measuredValue == 1))
-                    StateVector.Matrix[0][stateIndex] = new Complex(0);
+                    StateVector.Matrix[0][stateIndex] = ComplexProvider.Complex(0);
             }
         }
 
         private void NormalizeStateVector()
         {
             double remainingProbabilitiesSum = 0;
-            foreach (Complex amplitude in this.StateVector.Matrix[0])
+            foreach (IComplex amplitude in this.StateVector.Matrix[0])
             {
-                remainingProbabilitiesSum += Complex.Power(amplitude, 2).Real;
+                IComplex toAdd = ComplexProvider.Complex(amplitude.Real, amplitude.Imaginary);
+                toAdd.Power(2);
+                remainingProbabilitiesSum += toAdd.Real;
             }
 
-            IComplex normalizer = new Complex(System.Math.Sqrt(remainingProbabilitiesSum));
+            IComplex normalizer = ComplexProvider.Complex(System.Math.Sqrt(remainingProbabilitiesSum));
             for (int amplitudeIndex = 0; amplitudeIndex < StateVector.ColumnCount; amplitudeIndex++)
             {
                 StateVector.Matrix[0][amplitudeIndex].Divide(normalizer);

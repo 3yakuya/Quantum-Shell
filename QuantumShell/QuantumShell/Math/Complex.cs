@@ -31,6 +31,12 @@ namespace QuantumShell.Math
                 Imaginary = 0;        
         }
 
+        public Complex(double real, double imaginary) : this(real, imaginary, DefaultPrecision) { }
+
+        public Complex() : this(0, 0, DefaultPrecision) { }
+
+        public Complex(double realOnly) : this(realOnly, 0, DefaultPrecision) { }
+
         public void Add(IComplex number)
         {
             Complex result = this + (Complex)number;
@@ -42,7 +48,7 @@ namespace QuantumShell.Math
         {
             Complex result = this - (Complex)number;
             this.Real = result.Real;
-            this.Imaginary = result.Imaginary;   
+            this.Imaginary = result.Imaginary;
         }
 
         public void Multiply(IComplex number)
@@ -69,16 +75,12 @@ namespace QuantumShell.Math
             return Complex.Absolute(this);
         }
 
-        public IComplex Power(int power)
+        public void Power(int power)
         {
-            return Complex.Power(this, power);
+            Complex result = Complex.Power(this, power);
+            this.Real = result.Real;
+            this.Imaginary = result.Imaginary;
         }
-
-        public Complex(double real, double imaginary) : this(real, imaginary, DefaultPrecision) { }
-
-        public Complex() : this(0, 0, DefaultPrecision) { }
-
-        public Complex(double realOnly) : this(realOnly, 0, DefaultPrecision) { }
 
         public override string ToString()
         {
