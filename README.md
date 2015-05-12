@@ -11,8 +11,8 @@ for anyone interested in the topic - both as a standalone ready-to-use app or as
 your own experiments. Provided examples (available both from the interpreter and in code)
 should help you see how it is built and how to use it.
 
-There is also some solid docummentation to find in this project (currently available in Polish.)
-One paper contains a theoretical introduction ("Wstep") while the other one
+There is also some solid docummentation to find in this project (currently available in Polish and partially English.)
+One paper contains a theoretical introduction ("Wstep" (PL) or "Introduction" (ENG)) while the other one
 describes the architecture and solutions used in the application ("Symulator Komputera Kwantowego".)
 
 Feel free to use it.
