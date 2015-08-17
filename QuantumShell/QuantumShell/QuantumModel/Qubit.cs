@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using QuantumShell.Math;
 using QuantumShell.QuantumModel;
 
 namespace QuantumShell

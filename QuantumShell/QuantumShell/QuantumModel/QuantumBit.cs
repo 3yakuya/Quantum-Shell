@@ -15,7 +15,7 @@ namespace QuantumShell.QuantumModel
         void SetState(IComplexMatrix stateVector);
         void TransformState(IQuantumGate gate);
         void TransformStateControlled(IQuantumGate gate, QuantumBit control);
-        void TransformRegisterStateDirected(Func<int, int, int> stateTransform, Func<int, int> f, QuantumBit controlRepresentant);
+        void TransformRegisterStateDirected(Func<int, int, int> stateTransform, Func<int, int> indexFunction, QuantumBit control);
         string Peek();
         int Measure();
     }

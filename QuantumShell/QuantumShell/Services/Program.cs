@@ -1,14 +1,4 @@
-﻿using QuantumShell.Examples;
-using QuantumShell.Math;
-using QuantumShell.QuantumGates;
-using QuantumShell.QuantumGates.RotationGates;
-using QuantumShell.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using QuantumShell.Services;
 
 namespace QuantumShell
 {

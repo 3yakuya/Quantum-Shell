@@ -4,12 +4,9 @@ using QuantumShell.QuantumGates;
 using QuantumShell.QuantumGates.RotationGates;
 using QuantumShell.QuantumModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace QuantumShell.Services
 {
@@ -90,7 +87,7 @@ namespace QuantumShell.Services
 
             StreamReader reader = null;
 
-            Console.WriteLine("Quantum Shell (c) 2015 by Jakub Pilch");
+            Console.WriteLine("Quantum Shell (c) 2015 by Jakub Pilch (3yakuya)");
             Console.WriteLine("Type \"help\" to see possible commands.");
 
             while (isRunning)
@@ -300,7 +297,7 @@ namespace QuantumShell.Services
 
                         case "exit":
                             isRunning = false;
-                            Console.WriteLine("Thanks for usage! Press any key to quit.");
+                            Console.WriteLine("Thanks for using Quantum Shell! Press any key to quit.");
                             Console.ReadLine();
                             break;
 
@@ -386,7 +383,7 @@ namespace QuantumShell.Services
             Console.WriteLine("\t->R2(qubitNumber)");
             Console.WriteLine("\t->R3(qubitNumber)");
             Console.WriteLine("\t->R4(qubitNumber)");
-            Console.WriteLine("\t->c-G(control,target) (G can be any gate from above)");
+            Console.WriteLine("\t->c-G(target,control) (G can be any gate from above)");
             Console.WriteLine("\t->Peek(qubitNumber)");
             Console.WriteLine("\t->Measure(qubitNumber)");
             Console.WriteLine("\t->Join(fromQubit-toQubit)");
