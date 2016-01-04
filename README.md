@@ -12,7 +12,7 @@ your own experiments. Provided examples (available both from the interpreter and
 should help you see how it is built and how to use it.
 
 There is also some solid docummentation to find in this project (currently available in Polish and partially English.)
-One paper contains a theoretical introduction ("Wstep" (PL) or "Introduction" (ENG)) while the other one
+One paper contains a theoretical introduction ("Informatyka kwantowa i obliczenia kwantowe - krotki wstep" (PL) or "Quantum informatics and quantum computing - short introduction" (ENG)) while the other one
 describes the architecture and solutions used in the application ("Symulator Komputera Kwantowego".)
 
 Feel free to use it.
