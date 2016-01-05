@@ -15,7 +15,6 @@ There is also some solid docummentation to find in this project (currently avail
 One paper contains a theoretical introduction ("Informatyka kwantowa i obliczenia kwantowe - krotki wstep" (PL) or "Quantum informatics and quantum computing - short introduction" (ENG)) while the other one
 describes the architecture and solutions used in the application ("Symulator Komputera Kwantowego".)
 
-Feel free to use it.
-I kindly ask you to include the original header in your docummentation (#QuantumShell by Jakub Pilch - 3yakuya#)
-if you decide to use my work in your research. I would also be very grateful for a message - write me
-what do you build and how did you use Quantum Shell.
+This software is distributed under MIT license (see LICENSE.md)
+You are welcome to use my work, and if you do, I would be very grateful
+for a message - write me what do you build and how did you use Quantum Shell.
