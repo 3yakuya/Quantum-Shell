@@ -320,8 +320,8 @@ namespace QuantumShell
             foreach (IComplex amplitude in this.StateVector.Matrix[0])
             {
                 IComplex toAdd = ComplexProvider.Complex(amplitude.Real, amplitude.Imaginary);
-                toAdd.Power(2);
-                remainingProbabilitiesSum += toAdd.Real;
+                double absoluteValue = toAdd.Absolute();
+                remainingProbabilitiesSum += absoluteValue * absoluteValue;
             }
 
             IComplex normalizer = ComplexProvider.Complex(System.Math.Sqrt(remainingProbabilitiesSum));
