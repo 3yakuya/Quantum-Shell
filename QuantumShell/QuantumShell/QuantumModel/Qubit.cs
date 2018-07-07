@@ -75,7 +75,7 @@ namespace QuantumShell
         public void TransformState(IQuantumGate gate)
         {
             IComplexMatrix quantumOperator = BuildStateQuantumOperator(gate);
-            IComplexMatrix newStateVector = this.StateVector.Dot(quantumOperator);
+            IComplexMatrix newStateVector = quantumOperator.Dot(this.StateVector);
             SetState(newStateVector);
         }
 
@@ -85,7 +85,7 @@ namespace QuantumShell
                 throw new ArgumentException("Target qubit can not be used to control itself.");
             JoinState(controlQubit);
             IComplexMatrix controlledOperator = BuildControlledQuantumOperator(gate, controlQubit, this);
-            IComplexMatrix newStateVector = this.StateVector.Dot(controlledOperator);
+            IComplexMatrix newStateVector = controlledOperator.Dot(this.StateVector);
             SetState(newStateVector);
         }
 
@@ -101,25 +101,25 @@ namespace QuantumShell
             int targetRegisterSize = this.StateQubitList.Count;
             JoinState(controlRepresentant);
             IComplexMatrix fullStateOperator = BuildDirectedTransform(stateTransform, f, targetRegisterSize);
-            IComplexMatrix newStateVector = this.StateVector.Dot(fullStateOperator);
+            IComplexMatrix newStateVector = fullStateOperator.Dot(this.StateVector);
             SetState(newStateVector);
         }
 
         public string Peek()
         {
             string stateString = "";
-            int numberOfStates = StateVector.ColumnCount;
-            int qubitsInState = Convert.ToString(StateVector.ColumnCount, 2).Length - 1;
+            int numberOfStates = StateVector.RowCount;
+            int qubitsInState = Convert.ToString(StateVector.RowCount, 2).Length - 1;
             bool firstStatePeeked = false;
 
             for (int state = 0; state < numberOfStates; state++)
             {
-                if (!StateVector.Matrix[0][state].EqualTo(ComplexProvider.Complex(0)))
+                if (!StateVector.Matrix[state][0].EqualTo(ComplexProvider.Complex(0)))
                 {
                     if (firstStatePeeked)
                         stateString += " + ";
                     firstStatePeeked = true;
-                    stateString += StateVector.Matrix[0][state];
+                    stateString += StateVector.Matrix[state][0];
                     stateString += "|" + Convert.ToString(state, 2).PadLeft(qubitsInState, '0') + ">";
                 }
             }
@@ -153,14 +153,14 @@ namespace QuantumShell
 
         private IComplexMatrix BuildDirectedTransform(Func<int, int, int> stateTransform, Func<int, int> f, int targetRegisterSize)
         {
-            int stateSize = StateVector.Matrix[0].Count;
+            int stateSize = StateVector.RowCount;
             IComplexMatrix directedMultiQubitTransform = ComplexProvider.ComplexMatrix(stateSize, stateSize);
             IComplex amplitude = ComplexProvider.Complex(1);
 
-            for (int stateColumn = 0; stateColumn < stateSize; stateColumn++)
+            for (int stateIndex = 0; stateIndex < stateSize; stateIndex++)
             {
-                int controlStateIndex = GetHighRegisterState(stateColumn, targetRegisterSize);
-                int targetStateIndex = GetLowRegisterState(stateColumn, targetRegisterSize);
+                int controlStateIndex = GetHighRegisterState(stateIndex, targetRegisterSize);
+                int targetStateIndex = GetLowRegisterState(stateIndex, targetRegisterSize);
 
                 int processedControlParameter = f(controlStateIndex);
                 targetStateIndex = stateTransform(targetStateIndex, processedControlParameter);
@@ -168,14 +168,14 @@ namespace QuantumShell
                     throw new ArgumentException("Function processing the directed qubit returns incorrect values.");
 
                 int registerStateIndex = GetCompleteRegisterState(controlStateIndex, targetStateIndex, targetRegisterSize);
-                directedMultiQubitTransform.Matrix[stateColumn][registerStateIndex] = amplitude;
+                directedMultiQubitTransform.Matrix[registerStateIndex][stateIndex]= amplitude;
             }
             return directedMultiQubitTransform;
         }
 
-        private int GetCompleteRegisterState(int highRegisterState, int lowRegisterState, int highRegisterSize)
+        private int GetCompleteRegisterState(int highRegisterState, int lowRegisterState, int lowRegisterSize)
         {
-            int completeRegisterState = highRegisterState << highRegisterSize;
+            int completeRegisterState = highRegisterState << lowRegisterSize;
             completeRegisterState += lowRegisterState;
             return completeRegisterState;
         }
@@ -192,22 +192,22 @@ namespace QuantumShell
 
         private IComplexMatrix BuildControlledQuantumOperator(IQuantumGate gate, QuantumBit control, QuantumBit target)
         {
-            int stateSize = StateVector.Matrix[0].Count;
+            int stateSize = StateVector.RowCount;
             int numberOfQubits = StateQubitList.Count;
             int controlBit = StateQubitList.IndexOf(control);
             int targetBit = StateQubitList.IndexOf(target);
             IComplexMatrix controlledTransform = ComplexProvider.ComplexMatrix().IdentityMatrix(stateSize);
 
-            for (int row = 0; row < stateSize; row++)
+            for (int column = 0; column < stateSize; column++)
             {
-                if (BitIsSet(row, controlBit))
+                if (BitIsSet(column, controlBit))
                 {
-                    for (int column = 0; column < stateSize; column++)
+                    for (int row = 0; row < stateSize; row++)
                     {
                         bool correctState = true;
                         for (int stateBit = 0; (stateBit < numberOfQubits) && correctState; stateBit++)
                         {
-                            if ((BitIsSet(column, stateBit) != BitIsSet(row, stateBit)) && (stateBit != targetBit))
+                            if ((BitIsSet(row, stateBit) != BitIsSet(column, stateBit)) && (stateBit != targetBit))
                             {
                                     correctState = false;
                             }
@@ -247,9 +247,9 @@ namespace QuantumShell
 
         private void Reset()
         {
-            this.StateVector = ComplexProvider.ComplexMatrix(1, 2);
+            this.StateVector = ComplexProvider.ComplexMatrix(2, 1);
             this.StateVector.Matrix[0][0] = ComplexProvider.Complex(1);
-            this.StateVector.Matrix[0][1] = ComplexProvider.Complex(0);
+            this.StateVector.Matrix[1][0] = ComplexProvider.Complex(0);
 
             this.StateQubitList = ComplexProvider.List();
             this.StateQubitList.Add(this);
@@ -292,11 +292,11 @@ namespace QuantumShell
         {
             double probabilityOfZero = 0;
             int qubitIndex = StateQubitList.IndexOf(this);
-            for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
+            for (int stateIndex = 0; stateIndex < StateVector.RowCount; stateIndex++)
             {
                 if (!BitIsSet(stateIndex, qubitIndex))
                 {
-                    double absoluteValue = StateVector.Matrix[0][stateIndex].Absolute();
+                    double absoluteValue = StateVector.Matrix[stateIndex][0].Absolute();
                     probabilityOfZero += absoluteValue * absoluteValue;
                 }
             }
@@ -306,28 +306,28 @@ namespace QuantumShell
         private void ClearImpossibleStates(int measuredValue)
         {
             int qubitIndex = StateQubitList.IndexOf(this);
-            for (int stateIndex = 0; stateIndex < StateVector.ColumnCount; stateIndex++)
+            for (int stateIndex = 0; stateIndex < StateVector.RowCount; stateIndex++)
             {
                 if ((BitIsSet(stateIndex, qubitIndex) && measuredValue == 0) ||
                     (!BitIsSet(stateIndex, qubitIndex) && measuredValue == 1))
-                    StateVector.Matrix[0][stateIndex] = ComplexProvider.Complex(0);
+                    StateVector.Matrix[stateIndex][0] = ComplexProvider.Complex(0);
             }
         }
 
         private void NormalizeStateVector()
         {
             double remainingProbabilitiesSum = 0;
-            foreach (IComplex amplitude in this.StateVector.Matrix[0])
+            foreach (IList<IComplex> amplitude in this.StateVector.Matrix)
             {
-                IComplex toAdd = ComplexProvider.Complex(amplitude.Real, amplitude.Imaginary);
+                IComplex toAdd = ComplexProvider.Complex(amplitude[0].Real, amplitude[0].Imaginary);
                 double absoluteValue = toAdd.Absolute();
                 remainingProbabilitiesSum += absoluteValue * absoluteValue;
             }
 
             IComplex normalizer = ComplexProvider.Complex(System.Math.Sqrt(remainingProbabilitiesSum));
-            for (int amplitudeIndex = 0; amplitudeIndex < StateVector.ColumnCount; amplitudeIndex++)
+            for (int amplitudeIndex = 0; amplitudeIndex < StateVector.RowCount; amplitudeIndex++)
             {
-                StateVector.Matrix[0][amplitudeIndex].Divide(normalizer);
+                StateVector.Matrix[amplitudeIndex][0].Divide(normalizer);
             }
         }
     }
