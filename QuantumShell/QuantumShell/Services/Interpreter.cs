@@ -332,6 +332,7 @@ namespace QuantumShell.Services
                 Console.WriteLine("\t->Deutsch-Jozsa");
                 Console.WriteLine("\t->Factorization");
                 Console.WriteLine("\t->HiddenSubgroup");
+                Console.WriteLine("\t->Grover");
                 Console.WriteLine("\nType name of example or \"exit\" to quit example menu.");
                 Console.Write("-> ");
 
@@ -360,6 +361,11 @@ namespace QuantumShell.Services
                     case "HiddenSubgroup":
                         HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
                         hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
+                        break;
+
+                    case "Grover":
+                        Grover grover = new Grover();
+                        grover.GroverSearchQuantumRoutine();
                         break;
 
                     default:
