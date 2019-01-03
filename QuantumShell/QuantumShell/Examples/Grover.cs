@@ -31,6 +31,8 @@ namespace QuantumShell.Examples
                 QuantumSubroutine(register, H, G, D);
             }
 
+            Console.WriteLine(register[0].Peek());
+
             MeasureHighRegister(register);
             Console.ReadLine();
         }
