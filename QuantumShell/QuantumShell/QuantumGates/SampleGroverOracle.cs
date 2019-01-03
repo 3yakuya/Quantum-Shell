@@ -5,6 +5,10 @@ using System;
 
 namespace QuantumShell.QuantumGates
 {
+    /// <summary>
+    /// Sample oracle for Grover Search algorithm to find solutions for SampleOracleFunction.
+    /// Prepared in traditional notation (utilizing qubit indexed 0 as ancilla qubit.)
+    /// </summary>
     class SampleGroverOracle : IQuantumGate
     {
         public override int QubitCount { get; protected set; }
@@ -12,7 +16,7 @@ namespace QuantumShell.QuantumGates
 
         public SampleGroverOracle()
         {
-            this.QubitCount = 4;
+            this.QubitCount = 9;
             int stateSize = power(2, this.QubitCount);
             this.Transform = new ComplexMatrix(stateSize, stateSize);
             for (int row = 0; row < stateSize; row++)
@@ -33,7 +37,7 @@ namespace QuantumShell.QuantumGates
 
         private int SampleOracleFunction(int argument)
         {
-            return power(argument, 3) / 2 - 32 == 0 ? 1 : 0;
+            return argument - 173 == 0 ? 1 : 0;
         }
 
         private int power(int number, int exponent)

@@ -7,13 +7,13 @@ namespace QuantumShell.Examples
 {
     /// <summary>
     /// This class provides methods to show the possible usage of the Quantum Shell for the search problem.
+    /// Running Grover Search algorithm finding solution to SampleGroverOracle.SampleOracleFunction.
     /// </summary>
     class GroverSearch
     {
         public void GroverSearchQuantumRoutine()
         {
-            int registerSize = 4;
-
+            int registerSize = 9;
             QuantumBit[] register = InitializeQuantumRegister(registerSize);
 
             IQuantumGate H = new HadamardGate();
@@ -21,18 +21,25 @@ namespace QuantumShell.Examples
             IQuantumGate D = new GroverDiffusionGate();
             IQuantumGate X = new PauliXGate();
 
-            register[0].TransformState(X);
-            register[0].TransformState(H);
-
-            PeekRegister(register);
+            PrepareAncillaQubit(register, H, X);
             HadamardEntireState(register, H);
-            PeekRegister(register);
-            QuantumSubroutine(register, H, G, D);
-            QuantumSubroutine(register, H, G, D);
+
+            int repetitionCount = (int) System.Math.Ceiling(System.Math.Sqrt(registerSize)) + 1;
+
+            for (int repetition = 0; repetition < repetitionCount; repetition++)
+            {
+                QuantumSubroutine(register, H, G, D);
+            }
 
             MeasureHighRegister(register);
-
             Console.ReadLine();
+        }
+
+        private void PrepareAncillaQubit(QuantumBit[] register, IQuantumGate H, IQuantumGate X)
+        {
+            Console.WriteLine("Preparing ancilla qubit...");
+            register[0].TransformState(X);
+            register[0].TransformState(H);
         }
 
         private QuantumBit[] InitializeQuantumRegister(int size)
@@ -50,25 +57,20 @@ namespace QuantumShell.Examples
 
         private void QuantumSubroutine(QuantumBit[] register, IQuantumGate H, IQuantumGate G, IQuantumGate D)
         {
-            Console.WriteLine("\nPerforming the quantum subroutine...\n");
+            Console.WriteLine("Applying Oracle gate...");
             register[0].TransformState(G);
-            PeekRegister(register);
+            Console.WriteLine("Applying Diffusion gate...");
             register[1].TransformState(D);
-            PeekRegister(register);
             Console.WriteLine();
         }
 
         private void HadamardEntireState(QuantumBit[] register, IQuantumGate H)
         {
+            Console.WriteLine("Applying Hadamard gates to all target qubits...");
             for (int qubitIndex = 1; qubitIndex < register.Length; qubitIndex++)
             {
                 register[qubitIndex].TransformState(H);
             }
-        }
-
-        private void PeekRegister(QuantumBit[] register)
-        {
-            Console.WriteLine(register[0].Peek());
         }
 
         private void MeasureHighRegister(QuantumBit[] register)

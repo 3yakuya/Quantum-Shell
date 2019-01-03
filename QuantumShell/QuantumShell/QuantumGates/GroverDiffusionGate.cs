@@ -11,7 +11,7 @@ namespace QuantumShell.QuantumGates
 
         public GroverDiffusionGate()
         {
-            this.QubitCount = 3;
+            this.QubitCount = 8;
             int stateSize = power(2, this.QubitCount);
             this.Transform = new ComplexMatrix(stateSize, stateSize);
             

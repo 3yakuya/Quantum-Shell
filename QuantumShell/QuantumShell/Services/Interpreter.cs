@@ -87,7 +87,7 @@ namespace QuantumShell.Services
 
             StreamReader reader = null;
 
-            Console.WriteLine("Quantum Shell (c) 2015 by Jakub Pilch (3yakuya)");
+            Console.WriteLine("Quantum Shell (c) 2015-2018 by Jakub Pilch (3yakuya)");
             Console.WriteLine("Type \"help\" to see possible commands.");
 
             while (isRunning)
