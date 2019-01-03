@@ -24,7 +24,7 @@ namespace QuantumShell.Examples
             PrepareAncillaQubit(register, H, X);
             HadamardEntireState(register, H);
 
-            int repetitionCount = (int) System.Math.Ceiling(System.Math.Sqrt(registerSize)) + 1;
+            int repetitionCount = (int) System.Math.Ceiling(System.Math.Sqrt(System.Math.Pow(2, registerSize - 1))) + 1;
 
             for (int repetition = 0; repetition < repetitionCount; repetition++)
             {
