@@ -87,7 +87,7 @@ namespace QuantumShell.Services
 
             StreamReader reader = null;
 
-            Console.WriteLine("Quantum Shell (c) 2015 by Jakub Pilch (3yakuya)");
+            Console.WriteLine("Quantum Shell (c) 2015-2018 by Jakub Pilch (3yakuya)");
             Console.WriteLine("Type \"help\" to see possible commands.");
 
             while (isRunning)
@@ -332,6 +332,7 @@ namespace QuantumShell.Services
                 Console.WriteLine("\t->Deutsch-Jozsa");
                 Console.WriteLine("\t->Factorization");
                 Console.WriteLine("\t->HiddenSubgroup");
+                Console.WriteLine("\t->Grover");
                 Console.WriteLine("\nType name of example or \"exit\" to quit example menu.");
                 Console.Write("-> ");
 
@@ -360,6 +361,11 @@ namespace QuantumShell.Services
                     case "HiddenSubgroup":
                         HiddenSubgroup hiddenSubgroupProblem = new HiddenSubgroup();
                         hiddenSubgroupProblem.HiddenSubgroupQuantumSubroutine();
+                        break;
+
+                    case "Grover":
+                        GroverSearch groverSearch = new GroverSearch();
+                        groverSearch.GroverSearchQuantumRoutine();
                         break;
 
                     default:
