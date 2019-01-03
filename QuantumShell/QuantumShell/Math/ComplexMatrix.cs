@@ -37,7 +37,7 @@ namespace QuantumShell.Math
             }
             return identityMatrix;
         }
-
+        
         public IComplexMatrix Dot(IComplexMatrix second)
         {
             if (this.ColumnCount != second.RowCount)

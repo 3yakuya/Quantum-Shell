@@ -12,36 +12,57 @@ namespace QuantumShell.Examples
     {
         public void GroverSearchQuantumRoutine()
         {
-            int registerSize = 3;
+            int registerSize = 4;
 
             QuantumBit[] register = InitializeQuantumRegister(registerSize);
 
             IQuantumGate H = new HadamardGate();
             IQuantumGate G = new SampleGroverOracle();
             IQuantumGate D = new GroverDiffusionGate();
+            IQuantumGate X = new PauliXGate();
+
+            register[0].TransformState(X);
+            register[0].TransformState(H);
 
             PeekRegister(register);
-            QuantumSubroutine(register, G, D);
-            QuantumSubroutine(register, G, D);
+            HadamardEntireState(register, H);
             PeekRegister(register);
+            QuantumSubroutine(register, H, G, D);
+            QuantumSubroutine(register, H, G, D);
+
+            MeasureHighRegister(register);
 
             Console.ReadLine();
         }
 
-        private void QuantumSubroutine(QuantumBit[] register, IQuantumGate G, IQuantumGate D)
+        private QuantumBit[] InitializeQuantumRegister(int size)
         {
-            Console.WriteLine("\nPerforming the quantum subroutine...\n");
-            HadamardEntireState();
-            register[0].TransformState(G);
-            register[0].TransformState(D);
-            HadamardEntireState();
+            QuantumBit[] register = new Qubit[size];
+            IQuantumProvider provider = new ComplexProvider();
+            register[0] = new Qubit(0, provider);
+            for (int i = 1; i < size; i++)
+            {
+                register[i] = new Qubit(i, provider);
+                register[i].JoinState(register[i - 1]);
+            }
+            return register;
         }
 
-        private HadamardEntireState(QuantumBit[] register, HadamardGate H)
+        private void QuantumSubroutine(QuantumBit[] register, IQuantumGate H, IQuantumGate G, IQuantumGate D)
         {
-            for (Qubit in register)
+            Console.WriteLine("\nPerforming the quantum subroutine...\n");
+            register[0].TransformState(G);
+            PeekRegister(register);
+            register[1].TransformState(D);
+            PeekRegister(register);
+            Console.WriteLine();
+        }
+
+        private void HadamardEntireState(QuantumBit[] register, IQuantumGate H)
+        {
+            for (int qubitIndex = 1; qubitIndex < register.Length; qubitIndex++)
             {
-                Qubit.TransformState(H);
+                register[qubitIndex].TransformState(H);
             }
         }
 
@@ -53,7 +74,7 @@ namespace QuantumShell.Examples
         private void MeasureHighRegister(QuantumBit[] register)
         {
             Console.WriteLine("\nMeasured result:");
-            for (int i = register.size;  i >= 0; i--) 
+            for (int i = register.Length - 1;  i > 0; i--) 
             {
                 Console.Write(register[i].Measure());   
             }

@@ -1,6 +1,7 @@
 
 using QuantumShell.Math;
 using QuantumShell.QuantumModel;
+using System;
 
 namespace QuantumShell.QuantumGates
 {
@@ -11,8 +12,8 @@ namespace QuantumShell.QuantumGates
 
         public SampleGroverOracle()
         {
-            this.QubitCount = 3;
-            int stateSize = 2**3;
+            this.QubitCount = 4;
+            int stateSize = power(2, this.QubitCount);
             this.Transform = new ComplexMatrix(stateSize, stateSize);
             for (int row = 0; row < stateSize; row++)
             {
@@ -20,11 +21,11 @@ namespace QuantumShell.QuantumGates
                 {
                     if (row == col)
                     {
-                        Transfrom.Matrix[row][col].Real = SampleOracleFunction(2**row) == 0 ? -1 : 1;
+                        this.Transform.Matrix[row][col].Real = power(-1, SampleOracleFunction(row/2));
                     }
                     else
                     {
-                        Transfrom.Matrix[row][col].Real = 0
+                        this.Transform.Matrix[row][col].Real = 0;
                     }
                 }
             }
@@ -32,7 +33,18 @@ namespace QuantumShell.QuantumGates
 
         private int SampleOracleFunction(int argument)
         {
-            return argument**3/2;
+            return power(argument, 3) / 2 - 32 == 0 ? 1 : 0;
+        }
+
+        private int power(int number, int exponent)
+        {
+            int result = 1;
+            for (int i = 0; i < exponent; i++)
+            {
+                result *= number;
+            }
+
+            return result;
         }
     }
 }

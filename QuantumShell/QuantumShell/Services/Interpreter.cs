@@ -364,8 +364,8 @@ namespace QuantumShell.Services
                         break;
 
                     case "Grover":
-                        Grover grover = new Grover();
-                        grover.GroverSearchQuantumRoutine();
+                        GroverSearch groverSearch = new GroverSearch();
+                        groverSearch.GroverSearchQuantumRoutine();
                         break;
 
                     default:
